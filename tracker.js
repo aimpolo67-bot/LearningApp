@@ -1,20 +1,21 @@
-// This is your Master Tracker
 function trackActivity(lessonName, question, wasCorrect) {
-    // Hidden Safety: Don't track if the Developer is testing
-    if (localStorage.getItem('is_developer')) return;
+    console.log("Attempting to track:", lessonName, question); // <--- ADD THIS
 
-    // 1. YOUR DISCORD URL GOES HERE (Replace the link below)
-    const WEBHOOK_URL = "https://discord.com/api/webhooks/YOUR_WEBHOOK_URL_HERE";
+    if (localStorage.getItem('is_developer')) {
+        console.log("Tracking blocked: Developer Mode is ON");
+        return;
+    }
 
-    const status = wasCorrect ? "✅ Correct" : "❌ Wrong";
-    
-    // 2. Pointing to Discord instead of /api/track
+    const WEBHOOK_URL = "https://discord.com/api/webhooks/1484870438944374834/hGWeMMgWwJ4iS4n9UxMlDi0FNfEFbLArmLdHkBXgy3stVDyy1Zk6bwz_Mx-dJ78YMDob";
+
     fetch(WEBHOOK_URL, {
         method: 'POST',
+        mode: 'no-cors', // <--- ADD THIS to bypass some browser blocks
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-            username: "Hàn yǔ Quiz Bot", // This shows as the "sender" name
-            content: `**${lessonName}**\n> Result: ${status}\n> Word: *"${question}"*`
+            content: `**${lessonName}** | ${wasCorrect ? "✅" : "❌"} | *${question}*`
         })
-    }).catch((err) => console.log("Track failed:", err)); 
+    })
+    .then(() => console.log("Track sent to Discord!"))
+    .catch((err) => console.error("Discord Error:", err));
 }
