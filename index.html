@@ -5,150 +5,278 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GESC Chinese - Level 2</title>
     <style>
+        /* Define Dark Mode Variables */
+        :root {
+            --bg-color: #f0f2f5;
+            --container-bg: white;
+            --text-color: #2c3e50;
+            --subtitle-color: #7f8c8d;
+            --btn-bg: #3498db;
+            --btn-hover: #2980b9;
+            --progress-bg: #e0e0e0;
+            --section-bg: #f8f9fa;
+            --border-color: #eee;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #1a1a1a;
+            --container-bg: #2d2d2d;
+            --text-color: #ecf0f1;
+            --subtitle-color: #bdc3c7;
+            --btn-bg: #2980b9;
+            --btn-hover: #3498db;
+            --progress-bg: #444;
+            --section-bg: #333;
+            --border-color: #444;
+        }
+
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background-color: #f0f2f5; 
+            background-color: var(--bg-color); 
             display: flex; 
             justify-content: center; 
+            align-items: center; 
             min-height: 100vh; 
             margin: 0;
             padding: 20px;
             box-sizing: border-box;
+            transition: background-color 0.3s ease;
         }
         
         .menu-container { 
-            background: white; 
-            padding: 25px; 
+            background: var(--container-bg); 
+            padding: 30px; 
             border-radius: 25px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08); 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1); 
             width: 100%; 
-            max-width: 450px; 
+            max-width: 400px; 
             text-align: center;
-            /* အပေါ်ကနေ စတင်ပေါ်စေရန် align-self သုံးသည် */
-            align-self: flex-start;
-            margin-top: 20px;
+            position: relative; /* For theme toggle positioning */
+            transition: background-color 0.3s ease;
         }
 
-        h1 { 
-            color: #2c3e50; 
-            margin-bottom: 30px; 
-            font-size: 1.6rem; 
-            border-bottom: 2px solid #f0f2f5;
-            padding-bottom: 15px;
-        }
+        h1 { color: var(--text-color); margin-bottom: 5px; font-size: 1.5rem; }
 
-        .menu-btn { 
-            display: block;
-            background: #3498db; 
-            color: white; 
-            text-decoration: none; 
-            padding: 20px; 
-            border-radius: 18px; 
-            margin-bottom: 18px; 
-            transition: 0.3s;
-            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.2);
+        /* Dark Mode Toggle Switch */
+        .theme-switch-wrapper {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            display: flex;
+            align-items: center;
+        }
+        .theme-switch {
+            display: inline-block;
+            height: 24px;
             position: relative;
+            width: 50px;
         }
-
-        .menu-btn:hover { 
-            background: #2980b9; 
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(52, 152, 219, 0.3);
+        .theme-switch input { display:none; }
+        .slider {
+            background-color: #ccc;
+            bottom: 0;
+            cursor: pointer;
+            left: 0;
+            position: absolute;
+            right: 0;
+            top: 0;
+            transition: .4s;
+            border-radius: 34px;
         }
+        .slider:before {
+            background-color: white;
+            bottom: 4px;
+            content: "";
+            height: 16px;
+            left: 4px;
+            position: absolute;
+            transition: .4s;
+            width: 16px;
+            border-radius: 50%;
+        }
+        input:checked + .slider { background-color: #3498db; }
+        input:checked + .slider:before { transform: translateX(26px); }
 
-        .top-row {
+        /* Daily Quote Section */
+        .quote-section {
+            margin-bottom: 20px;
+            padding: 10px;
+            font-style: italic;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .quote-cn { color: var(--btn-bg); font-size: 1.1rem; font-weight: bold; }
+        .quote-py { color: var(--subtitle-color); font-size: 0.85rem; }
+
+        /* Progress Section */
+        .progress-section {
+            margin-bottom: 25px;
+            background: var(--section-bg);
+            padding: 15px;
+            border-radius: 15px;
+            border: 1px solid var(--border-color);
+        }
+        .progress-text {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: var(--btn-bg);
             margin-bottom: 8px;
         }
-
-        .cn-title { 
-            font-size: 1.2rem; 
-            font-weight: bold;
+        .bar-bg {
+            width: 100%;
+            height: 10px;
+            background: var(--progress-bg);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .bar-fill {
+            width: 21%; 
+            height: 100%;
+            background: linear-gradient(90deg, #3498db, #2ecc71);
+            border-radius: 5px;
+            transition: 0.5s;
         }
 
+        /* Lesson Buttons */
+        .menu-btn { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            background: var(--btn-bg); 
+            color: white; 
+            text-decoration: none; 
+            padding: 18px 25px; 
+            border-radius: 15px; 
+            margin-bottom: 15px; 
+            font-weight: bold; 
+            transition: 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .menu-btn:hover { 
+            background: var(--btn-hover); 
+            transform: translateY(-3px);
+        }
+
+        .lesson-info { display: flex; flex-direction: column; text-align: left; }
+        .cn-title { font-size: 1.1rem; color: white; }
+        .mm-title { font-size: 0.8rem; font-weight: normal; opacity: 0.9; color: white; }
         .lesson-num {
-            background: rgba(255, 255, 255, 0.25);
-            padding: 4px 10px;
-            border-radius: 8px;
-            font-size: 0.8rem;
-            font-weight: bold;
-        }
-
-        .mm-title { 
-            display: block;
-            text-align: left;
-            font-size: 0.9rem; 
-            opacity: 0.9;
-            margin-bottom: 10px;
-        }
-
-        /* Progress Bar Area */
-        .progress-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.75rem;
-            background: rgba(0, 0, 0, 0.1);
-            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px 12px;
             border-radius: 10px;
-            margin-top: 5px;
+            font-size: 0.8rem;
+            color: white;
         }
 
         .footer { 
-            margin-top: 30px; 
-            color: #bdc3c7; 
-            font-size: 0.85rem; 
-            padding: 15px;
+            margin-top: 20px; 
+            color: var(--subtitle-color); 
+            font-size: 0.8rem;
+            border-top: 1px solid var(--border-color);
+            padding-top: 15px;
         }
+        .credit-text { display: block; margin-top: 8px; color: #95a5a6; font-size: 0.75rem; font-style: italic; }
     </style>
 </head>
 <body>
 
 <div class="menu-container">
-    <h1>GESC Chinese - Level 2</h1>
+    <div class="theme-switch-wrapper">
+        <label class="theme-switch" for="checkbox">
+            <input type="checkbox" id="checkbox" />
+            <div class="slider"></div>
+        </label>
+    </div>
+
+    <h1>Level 2 Lessons</h1>
+
+    <div class="quote-section" id="quote-container">
+        <div class="quote-cn" id="quote-cn">加油!</div>
+        <div class="quote-py" id="quote-py">Jiāyóu! (Keep going!)</div>
+    </div>
+
+    <div class="progress-section">
+        <div class="progress-text">
+            <span>Course Progress</span>
+            <span>3 / 14 Lessons</span>
+        </div>
+        <div class="bar-bg">
+            <div class="bar-fill"></div>
+        </div>
+    </div>
     
     <a href="lvl2lesson1.html" class="menu-btn">
-        <div class="top-row">
+        <div class="lesson-info">
             <span class="cn-title">爱好 (Àihào)</span>
-            <span class="lesson-num">Lesson 1</span>
+            <span class="mm-title">ဝါသနာ</span>
         </div>
-        <span class="mm-title">ဝါသနာ</span>
-        <div class="progress-info">
-            <span>Learning Progress</span>
-            <span>0 / 14</span>
-        </div>
+        <span class="lesson-num">L-1</span>
     </a>
 
     <a href="lvl2lesson2.html" class="menu-btn">
-        <div class="top-row">
+        <div class="lesson-info">
             <span class="cn-title">问路 (Wènlù)</span>
-            <span class="lesson-num">Lesson 2</span>
+            <span class="mm-title">လမ်းမေးခြင်း</span>
         </div>
-        <span class="mm-title">လမ်းမေးခြင်း</span>
-        <div class="progress-info">
-            <span>Learning Progress</span>
-            <span>0 / 18</span>
-        </div>
+        <span class="lesson-num">L-2</span>
     </a>
 
     <a href="lvl2lesson3.html" class="menu-btn">
-        <div class="top-row">
+        <div class="lesson-info">
             <span class="cn-title">打电话 (Dǎ diànhuà)</span>
-            <span class="lesson-num">Lesson 3</span>
+            <span class="mm-title">ဖုန်းဆက်ခြင်း</span>
         </div>
-        <span class="mm-title">ဖုန်းဆက်ခြင်း</span>
-        <div class="progress-info">
-            <span>Learning Progress</span>
-            <span>0 / 17</span>
-        </div>
+        <span class="lesson-num">L-3</span>
     </a>
 
     <div class="footer">
-        နောင်ထပ် သင်ခန်းစာများကိုလည်း မကြာမီ ထည့်သွင်းပေးပါမည်။
+        
+        <span class="credit-text">Created by GESC Student</span>
     </div>
 </div>
+
+<script>
+    // --- Dark Mode Logic ---
+    const toggleSwitch = document.querySelector('.theme-switch input[type="checkbox"]');
+    const currentTheme = localStorage.getItem('theme');
+
+    // Check for saved theme on load
+    if (currentTheme) {
+        document.documentElement.setAttribute('data-theme', currentTheme);
+        if (currentTheme === 'dark') {
+            toggleSwitch.checked = true;
+        }
+    }
+
+    // Handle theme switching
+    function switchTheme(e) {
+        if (e.target.checked) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            localStorage.setItem('theme', 'dark');
+        } else {
+            document.documentElement.setAttribute('data-theme', 'light');
+            localStorage.setItem('theme', 'light');
+        }    
+    }
+    toggleSwitch.addEventListener('change', switchTheme, false);
+
+    // --- Daily Quote Logic ---
+    const quotes = [
+        { cn: "加油!", py: "Jiāyóu! (Keep going!)" },
+        
+    ];
+
+    function setRandomQuote() {
+        const randomIndex = Math.floor(Math.random() * quotes.length);
+        const quote = quotes[randomIndex];
+        document.getElementById('quote-cn').innerText = quote.cn;
+        document.getElementById('quote-py').innerText = quote.py;
+    }
+
+    // Set a quote immediately on load
+    setRandomQuote();
+</script>
 
 </body>
 </html>
