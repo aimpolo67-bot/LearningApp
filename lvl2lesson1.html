@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lesson 1: 爱好 (Àihào) - ဝါသနာ</title>
+    
+    <style>
+        body { 
+            font-family: sans-serif; 
+            background-color: #f0f2f5; 
+            display: flex; 
+            justify-content: center; 
+            padding: 15px; 
+            padding-bottom: 80px; 
+            margin: 0; 
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+        }
+
+        .home-icon-btn {
+            text-decoration: none;
+            background: white;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            font-size: 1.8rem;
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 2px solid #3498db;
+        }
+
+        .home-icon-btn:hover {
+            transform: scale(1.1);
+            background: #f0f7ff;
+        }
+
+        #quiz-container { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 500px; text-align: center; position: relative; overflow: hidden; transition: transform 0.1s; }
+        #progress-wrapper { width: 100%; height: 8px; background: #eee; border-radius: 4px; margin-bottom: 10px; overflow: hidden; }
+        #progress-fill { height: 100%; width: 0%; background: #2ecc71; transition: width 0.3s ease; }
+        #streak-display { font-size: 1.2rem; margin-bottom: 5px; min-height: 1.5rem; transition: transform 0.2s; }
+        .level-header { background: #2c3e50; color: white; padding: 10px; border-radius: 10px; margin-bottom: 5px; font-weight: bold; }
+        .progress-sub { font-size: 0.85rem; color: #34495e; margin-bottom: 15px; background: #ecf0f1; padding: 5px; border-radius: 5px; font-weight: bold; }
+        .display-area { margin: 15px 0; min-height: 3rem; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        .chinese-display { font-size: 1.8rem; color: #2c3e50; font-weight: bold; line-height: 1.3; }
+        .pinyin-display { font-size: 1rem; color: #7f8c8d; font-style: italic; }
+        
+        /* Updated Grid Layout */
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+        
+        .scrambled-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 20px; }
+        button { padding: 12px; border: 2px solid #3498db; background: white; border-radius: 10px; cursor: pointer; font-size: 0.95rem; transition: 0.1s; outline: none; }
+        button:disabled { cursor: default; }
+        .pinyin-part { border-color: #e67e22; color: #d35400; font-style: italic; transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .pinyin-part.part-noun { border-color: #3498db; color: #2980b9; }
+        .pinyin-part.part-verb { border-color: #9b59b6; color: #8e44ad; }
+        .pinyin-part.part-particle { border-color: #95a5a6; color: #7f8c8d; }
+        .pinyin-part:disabled { background: #f8f9fa !important; border: 2px dashed #bdc3c7 !important; color: #bdc3c7 !important; opacity: 0.5; transform: scale(0.9); }
+        .btn-correct { background: #2ecc71 !important; color: white !important; border-color: #27ae60 !important; }
+        .btn-wrong { background: #e74c3c !important; color: white !important; border-color: #c0392b !important; }
+        #feedback { margin-top: 15px; font-weight: bold; min-height: 45px; padding: 10px; border-radius: 10px; line-height: 1.4; transition: background 0.2s; }
+        .feedback-correct { background: #eafff0 !important; border: 1px solid #2ecc71; }
+        .feedback-wrong-box { background: #fff5f5 !important; border: 1px solid #e74c3c; }
+        #user-build { color: #2980b9; font-size: 1.2rem; font-style: italic; margin: 10px 0; min-height: 2.5rem; max-height: 120px; overflow-y: auto; border: 1px dashed #3498db; padding: 10px; border-radius: 5px; background: #fcfdfd; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 5px; transition: all 0.2s; }
+        .slot-item { animation: slideIn 0.2s ease-out; }
+        @keyframes slideIn { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes shake { 0% { transform: translateX(0); } 25% { transform: translateX(-8px); } 50% { transform: translateX(8px); } 75% { transform: translateX(-8px); } 100% { transform: translateX(0); } }
+        .shake { animation: shake 0.3s ease-in-out; }
+        #lvl3-controls { margin-top: 25px; display: flex; justify-content: center; gap: 10px; }
+        .reset-btn { background: #e67e22; color: white; border: none; padding: 10px 22px; border-radius: 5px; font-weight: bold; cursor: pointer; }
+        .undo-btn { background: #34495e; color: white; border: none; padding: 10px 22px; border-radius: 5px; font-weight: bold; cursor: pointer; }
+        .hint-btn { background: #f1c40f; color: #2c3e50; border: none; padding: 10px 22px; border-radius: 5px; font-weight: bold; cursor: pointer; }
+        
+        /* New Next Button Style */
+        .next-btn { background: #2ecc71; color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; width: 100%; cursor: pointer; margin-top: 10px; display: none; }
+        
+        .menu-btn { background: #3498db; color: white; font-size: 1.1rem; border: none; padding: 15px; border-radius: 10px; font-weight: bold; margin-bottom: 10px; width: 100%; cursor: pointer; }
+        .home-btn { margin-top: 25px; background: #95a5a6; color: white; border: none; width: 100%; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        #summary-screen { display: none; padding: 20px; }
+        .stat-circle { width: 100px; height: 100px; border-radius: 50%; border: 5px solid #2ecc71; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; margin: 10px auto; color: #2ecc71; }
+        #star-rating { font-size: 2.5rem; color: #f1c40f; margin-bottom: 10px; letter-spacing: 5px; min-height: 3rem; }
+        .no-stars { color: #e74c3c !important; font-size: 1.5rem !important; font-weight: bold; }
+        #review-container { margin-top: 20px; text-align: left; background: #f9f9f9; padding: 15px; border-radius: 10px; border: 1px solid #eee; max-height: 200px; overflow-y: auto; }
+        .review-item { margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+        .review-cn { font-weight: bold; color: #2c3e50; }
+        .review-mm { color: #7f8c8d; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+
+    <div id="quiz-container">
+        <div id="menu-screen">
+            <h2 id="app-title" style="color: #2c3e50;">Lesson 1: 爱好 (Àihào) - ဝါသနာ</h2>
+            <div id="main-menu">
+                <button class="menu-btn" onclick="goToLevel(1)">Shēngcí (生词)</button>
+                <button class="menu-btn" onclick="goToLevel(2)">Duìhuà (对话)</button>
+                <button class="menu-btn" onclick="goToLevel(3)">Páijùzi (排句子)</button>
+            </div>
+        </div>
+
+        <div id="game-screen" style="display:none;">
+            <div id="progress-wrapper"><div id="progress-fill"></div></div>
+            <div id="streak-display"></div>
+            <div class="level-header" id="level-tag">--</div>
+            <div class="progress-sub" id="progress-info">--</div>
+            
+            <div id="level-1-2-ui">
+                <div class="display-area">
+                    <div class="chinese-display" id="cn-q">--</div>
+                    <div class="pinyin-display" id="py-q">--</div>
+                </div>
+            </div>
+
+            <div id="level-3-ui" style="display:none;">
+                <div style="color: #7f8c8d; font-size: 1.1rem; margin-bottom: 5px; min-height: 1.5rem;" id="cn-hint-text"></div>
+                <div style="color: #2c3e50; font-size: 1.4rem; font-weight: bold; margin-bottom: 10px;" id="mm-hint">--</div>
+                <div id="user-build"></div>
+            </div>
+
+            <div class="options-grid" id="options"></div>
+            <div class="scrambled-grid" id="scrambled-words"></div>
+            
+            <div id="lvl3-controls" style="display:none;">
+                <button class="undo-btn" id="undo-btn" onclick="undoLast()">Undo</button>
+                <button class="reset-btn" id="reset-btn" onclick="resetSentence()">Reset</button>
+                <button class="hint-btn" id="hint-btn" onclick="showHint()">Hint</button>
+            </div>
+
+            <div id="feedback"></div>
+            <button id="next-btn" class="next-btn" onclick="autoNext()">Next Question ➔</button>
+            <button class="home-btn" onclick="showMainMenu()">🏠 Back to Lesson Menu</button>
+        </div>
+
+        <div id="summary-screen">
+            <h2 style="color: #2c3e50;">Lesson Finished!</h2>
+            <div id="star-rating"></div>
+            <div class="stat-circle" id="accuracy-pct">0%</div>
+            <p id="summary-stats" style="color: #7f8c8d; line-height: 1.6;"></p>
+            
+            <div id="review-container" style="display:none;">
+                <div style="font-weight: bold; margin-bottom: 10px; color: #e74c3c;">Review Mistakes:</div>
+                <div id="review-list"></div>
+            </div>
+
+            <button class="menu-btn" onclick="showMainMenu()" style="margin-top:15px;">Back to Lesson Menu</button>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <a href="index.html" class="home-icon-btn" title="Back to Main Menu">🏠</a>
+    </div>
+
+<script>
+        const CONFIG = {
+    title: "Level 2 Lesson 1: 爱好 (Àihào) - ဝါသနာ",
+    vocab: [
+        { cn: "爱好", py: "àihào", mm: "ဝါသနာ" }, 
+        { cn: "唱歌", py: "chàng gē", mm: "သီချင်းဆိုသည်" },
+        { cn: "音乐", py: "yīnyuè", mm: "ဂီတ" }, 
+        { cn: "情况", py: "qíngkuàng", mm: "အခြေအနေ" },
+        { cn: "洗澡", py: "xǐ zǎo", mm: "ရေချိုးသည်" }, 
+        { cn: "放松", py: "fàngsōng", mm: "စိတ်အပန်းပြေစေသည်" },
+        { cn: "心情", py: "xīnqíng", mm: "စိတ်ခံစားမှု" }, 
+        { cn: "其它", py: "qítā", mm: "အခြား" },
+        { cn: "画画", py: "huà huà", mm: "ပန်းချီဆွဲသည်" }, 
+        { cn: "知识", py: "zhīshi", mm: "ဗဟုသုတ" },
+        { cn: "电视剧", py: "diànshìjù", mm: "တီဗီဇာတ်လမ်းတွဲ" }, 
+        { cn: "韩剧", py: "Hánjù", mm: "ကိုရီးယားဇာတ်လမ်းတွဲ" },
+        { cn: "运动", py: "yùndòng", mm: "အားကစား" }, 
+        { cn: "最近", py: "zuìjìn", mm: "လောလောဆယ်" },
+        { cn: "业余", py: "yèyú", mm: "အားလပ်ချိန်" }, 
+        { cn: "足球比赛", py: "zúqiú bǐsài", mm: "ဘောလုံးပြိုင်ပွဲ" },
+        { cn: "跳舞", py: "tiào wǔ", mm: "ကခုန်သည်" }, 
+        { cn: "拜佛", py: "bài fó", mm: "ဘုရားရှိခိုး" },
+        { cn: "大金塔", py: "Dàjīntǎ", mm: "ရွှေတိဂုံဘုရား" }, 
+        { cn: "聊天", py: "liáo tiān", mm: "စကားပြောသည်" },
+        { cn: "逛街", py: "guàng jiē", mm: "ဈေးဝယ်ထွက်သည်" }, 
+        { cn: "常常", py: "chángcháng", mm: "မကြာမကြာ" },
+        { cn: "网上", py: "wǎngshàng", mm: "အင်တာနက်ပေါ်" }, 
+        { cn: "让", py: "ràng", mm: "လုပ်ခိုင်းသည်" },
+        { cn: "少", py: "shǎo", mm: "နည်းသည်" }, 
+        { cn: "多", py: "duō", mm: "များပြား" },
+        { cn: "这样", py: "zhèyàng", mm: "ဒီလို" }, 
+        { cn: "才", py: "cái", mm: "မှ" },
+        { cn: "进步", py: "jìnbù", mm: "တိုးတက်မှု" }
+    ],
+    sentences: [
+        { 
+            cn: "你有什么爱好？", 
+            py: "Nǐ yǒu shénme àihào?", 
+            mm: "မင်းမှာ ဘာဝါသနာရှိလဲ?", 
+            pyParts: [{w:"Nǐ"}, {w:"yǒu"}, {w:"shénme"}, {w:"àihào?"}] 
+        },
+        { 
+            cn: "我的爱好是唱歌和听音乐。", 
+            py: "Wǒ de àihào shì chànggē hé tīng yīnyuè.", 
+            mm: "ကျွန်တော့်ဝါသနာက သီချင်းဆိုတာနဲ့ သီချင်းနားထောင်တာပါ။", 
+            pyParts: [{w:"Wǒ de"}, {w:"àihào shì"}, {w:"chànggē"}, {w:"hé"}, {w:"tīng yīnyuè."}] 
+        },
+        { 
+            cn: "洗澡的时候，我会唱歌。", 
+            py: "Xǐ zǎo de shíhou, wǒ huì chàng gē.", 
+            mm: "ရေချိုးတဲ့အချိန်မှာ ငါသီချင်းဆိုတယ်။", 
+            pyParts: [{w:"Xǐ zǎo"}, {w:"de shíhou,"}, {w:"wǒ huì"}, {w:"chàng gē."}] 
+        },
+        { 
+            cn: "因为听音乐可以放松心情。", 
+            py: "Yīnwèi tīng yīnyuè kěyǐ fàngsōng xīnqíng.", 
+            mm: "ဘာလို့လဲဆိုတော့ သီချင်းနားထောင်တာက စိတ်အပန်းပြေစေလို့ပါ။", 
+            pyParts: [{w:"Yīnwèi"}, {w:"tīng yīnyuè"}, {w:"kěyǐ"}, {w:"fàngsōng"}, {w:"xīnqíng."}] 
+        },
+        { 
+            cn: "我的爱好是看书和看电视剧。", 
+            py: "Wǒ de àihào shì kànshū hé kàndiànshìjù.", 
+            mm: "ကျွန်တော့်ဝါသနာက စာဖတ်တာနဲ့ တီဗီဇာတ်လမ်းတွဲကြည့်တာပါ။", 
+            pyParts: [{w:"Wǒ de"}, {w:"àihào shì"}, {w:"kànshū"}, {w:"hé"}, {w:"kàndiànshìjù."}] 
+        },
+        { 
+            cn: "我在看韩剧。", 
+            py: "Wǒ zài kàn Hánjù.", 
+            mm: "ကျွန်တော် ကိုရီးယားဇာတ်လမ်းတွဲ ကြည့်နေပါတယ်။", 
+            pyParts: [{w:"Wǒ"}, {w:"zài kàn"}, {w:"Hánjù."}] 
+        },
+        { 
+            cn: "明天我要去大金塔拜佛。", 
+            py: "Míngtiān wǒ yào qù Dàjīntǎ bàifó.", 
+            mm: "မနက်ဖြန် ငါရွှေတိဂုံဘုရားကို ဘုရားဖူးသွားမယ်။", 
+            pyParts: [{w:"Míngtiān"}, {w:"wǒ"}, {w:"yào"}, {w:"qù"}, {w:"Dàjīntǎ"}, {w:"bàifó."}] 
+        },
+        { 
+            cn: "周末我们去逛街吧。", 
+            py: "Zhōumò wǒmen qù guàngjiē ba.", 
+            mm: "ပိတ်ရက်မှာ ငါတို့ ဈေးဝယ်ထွက်ကြစို့။", 
+            pyParts: [{w:"Zhōumò"}, {w:"wǒmen"}, {w:"qù"}, {w:"guàngjiē"}, {w:"ba."}] 
+        },
+        { 
+            cn: "医生让我多运动。", 
+            py: "Yīshēng ràng wǒ duō yùndòng.", 
+            mm: "ဆရာဝန်က ငါ့ကို ကိုယ်လက်လှုပ်ရှား များများလုပ်ခိုင်းတယ်။", 
+            pyParts: [{w:"Yīshēng"}, {w:"ràng"}, {w:"wǒ"}, {w:"duō"}, {w:"yùndòng."}] 
+        },
+        { 
+            cn: "我们要好好学习，这样才会有进步。", 
+            py: "Wǒmen yào hǎohǎo xuéxí, zhèyàng cái huì yǒu jìnbù.", 
+            mm: "ငါတို့ကောင်းကောင်းစာလေ့လာရမယ်၊ ဒီလိုမှပဲတိုးတက်မှုရှိမယ်။", 
+            pyParts: [{w:"Wǒmen"}, {w:"yào"}, {w:"hǎohǎo xuéxí,"}, {w:"zhèyàng"}, {w:"cái huì yǒu"}, {w:"jìnbù."}] 
+        }
+    ]
+};
+
+    let currentLevel = 1, pool = [], currentIndex = 0, currentItem = {}, buildResult = [], canClick = true;
+    let errorCount = 0, correctCount = 0, currentStreak = 0, maxStreak = 0, startTime = 0;
+    let missedItems = [], initialPoolSize = 0;
+
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    function triggerShake() {
+        const container = document.getElementById('quiz-container');
+        container.classList.add('shake');
+        setTimeout(() => container.classList.remove('shake'), 300);
+    }
+
+    function showMainMenu() {
+        document.getElementById('menu-screen').style.display = "block";
+        document.getElementById('game-screen').style.display = "none";
+        document.getElementById('summary-screen').style.display = "none";
+    }
+
+    function goToLevel(lvl) {
+        currentLevel = lvl; currentIndex = 0; errorCount = 0; correctCount = 0; currentStreak = 0; maxStreak = 0;
+        missedItems = []; startTime = Date.now();
+        document.getElementById('menu-screen').style.display = "none";
+        document.getElementById('game-screen').style.display = "block";
+        document.getElementById('summary-screen').style.display = "none";
+        let rawPool = (lvl === 1) ? [...CONFIG.vocab] : [...CONFIG.sentences];
+        pool = shuffleArray(rawPool);
+        initialPoolSize = pool.length;
+        if (lvl === 1) { document.getElementById('level-tag').innerText = "Shēngcí (生词)"; document.getElementById('lvl3-controls').style.display = "none"; }
+        else if (lvl === 2) { document.getElementById('level-tag').innerText = "Duìhuà (对话)"; document.getElementById('lvl3-controls').style.display = "none"; }
+        else { document.getElementById('level-tag').innerText = "Páijùzi (排句子)"; document.getElementById('lvl3-controls').style.display = "flex"; }
+        updateQuestion();
+    }
+
+    function updateQuestion() {
+        canClick = true;
+        document.getElementById('next-btn').style.display = "none";
+        const fb = document.getElementById('feedback');
+        fb.innerText = ""; fb.className = ""; fb.style.background = "transparent";
+        document.getElementById('user-build').innerHTML = "";
+        document.getElementById('options').innerHTML = "";
+        document.getElementById('scrambled-words').innerHTML = "";
+        document.getElementById('cn-hint-text').innerText = "";
+        
+        if(currentLevel === 3) {
+            document.getElementById('undo-btn').disabled = false;
+            document.getElementById('reset-btn').disabled = false;
+            document.getElementById('hint-btn').disabled = false;
+        }
+
+        buildResult = [];
+        const progressPct = Math.min(((currentIndex) / initialPoolSize) * 100, 99);
+        document.getElementById('progress-fill').style.width = progressPct + "%";
+        document.getElementById('progress-info').innerText = `Item: ${currentIndex + 1} / ${pool.length}`;
+        currentItem = pool[currentIndex];
+        if (currentLevel < 3) {
+            document.getElementById('level-1-2-ui').style.display = "block";
+            document.getElementById('level-3-ui').style.display = "none";
+            document.getElementById('cn-q').innerText = currentItem.cn;
+            document.getElementById('py-q').innerText = currentItem.py;
+            renderOptions();
+        } else {
+            document.getElementById('level-1-2-ui').style.display = "none";
+            document.getElementById('level-3-ui').style.display = "block";
+            document.getElementById('mm-hint').innerText = currentItem.mm;
+            renderScramble();
+        }
+    }
+
+    function renderOptions() {
+        let choices = [currentItem.mm];
+        let wrongSource = (currentLevel === 1) ? CONFIG.vocab : CONFIG.sentences;
+        let wrongOptions = wrongSource.filter(item => item.mm !== currentItem.mm);
+        shuffleArray(wrongOptions);
+        while (choices.length < 4 && wrongOptions.length > 0) {
+            let r = wrongOptions.pop().mm;
+            if (!choices.includes(r)) choices.push(r);
+        }
+        shuffleArray(choices);
+        choices.forEach(c => {
+            const b = document.createElement('button');
+            b.innerText = c;
+            b.onclick = () => handleChoice(c, b);
+            document.getElementById('options').appendChild(b);
+        });
+    }
+
+    function handleChoice(selected, btn) {
+        if (!canClick) return;
+        canClick = false;
+        const allBtns = document.querySelectorAll('#options button');
+        allBtns.forEach(b => b.disabled = true);
+        const fb = document.getElementById('feedback');
+        const nextBtn = document.getElementById('next-btn');
+
+        if (selected === currentItem.mm) {
+            btn.classList.add('btn-correct');
+            fb.className = "feedback-correct";
+            fb.innerHTML = `<span style="color:#2ecc71">Correct! ✓</span>`;
+            correctCount++;
+            updateStreak(true);
+            nextBtn.style.display = "block";
+        } else {
+            btn.classList.add('btn-wrong'); 
+            allBtns.forEach(b => { if (b.innerText === currentItem.mm) b.classList.add('btn-correct'); });
+            triggerShake();
+            errorCount++;
+            let reIndex = currentIndex + 4;
+            if(reIndex > pool.length) reIndex = pool.length;
+            pool.splice(reIndex, 0, currentItem);
+            if (!missedItems.includes(currentItem)) missedItems.push(currentItem);
+            updateStreak(false);
+            fb.className = "feedback-wrong-box";
+            fb.innerHTML = `<span style="color:#e74c3c">✘ Wrong</span><br><span style="color:#555; font-size:0.9rem;">Correct: ${currentItem.mm}</span>`;
+            nextBtn.style.display = "block";
+        }
+    }
+
+    function renderScramble() {
+        let pinyinParts = shuffleArray(currentItem.pyParts.map((obj, i) => {
+            return {w: obj.w, t: obj.t || 'default', id: i};
+        }));
+        pinyinParts.forEach(partObj => {
+            const b = document.createElement('button');
+            b.innerText = partObj.w; 
+            b.className = `pinyin-part part-${partObj.t}`;
+            b.onclick = () => {
+                if(!canClick || b.disabled) return;
+                b.disabled = true;
+                buildResult.push(partObj.w);
+                const slot = document.createElement('span');
+                slot.innerText = partObj.w;
+                slot.className = 'slot-item';
+                document.getElementById('user-build').appendChild(slot);
+                if (buildResult.length === currentItem.pyParts.length) checkSentence();
+            };
+            document.getElementById('scrambled-words').appendChild(b);
+        });
+    }
+
+    function checkSentence() {
+        canClick = false;
+        const userStr = buildResult.join(" ").replace(/\s+([,.!?])/g, '$1');
+        const correctStr = currentItem.pyParts.map(p => p.w).join(" ").replace(/\s+([,.!?])/g, '$1');
+        const fb = document.getElementById('feedback');
+        const nextBtn = document.getElementById('next-btn');
+
+        // Disable controls
+        document.getElementById('undo-btn').disabled = true;
+        document.getElementById('reset-btn').disabled = true;
+        document.getElementById('hint-btn').disabled = true;
+
+        if (userStr === correctStr) {
+            fb.className = "feedback-correct";
+            fb.innerHTML = `<span style="color:#2ecc71">Correct! ✓</span><br><small>${currentItem.py}</small>`;
+            correctCount++;
+            updateStreak(true);
+            nextBtn.style.display = "block";
+        } else {
+            triggerShake();
+            errorCount++;
+            let reIndex = currentIndex + 3;
+            if(reIndex > pool.length) reIndex = pool.length;
+            pool.splice(reIndex, 0, currentItem);
+            if (!missedItems.includes(currentItem)) missedItems.push(currentItem);
+            updateStreak(false);
+            fb.className = "feedback-wrong-box";
+            fb.innerHTML = `<span style="color:#e74c3c">✘ Wrong Order</span><br><small>Correct: ${correctStr}</small>`;
+            nextBtn.style.display = "block";
+        }
+    }
+
+    function autoNext() {
+        currentIndex++;
+        if (currentIndex < pool.length) updateQuestion();
+        else showSummary();
+    }
+
+    function updateStreak(isCorrect) {
+        if (isCorrect) {
+            currentStreak++;
+            if (currentStreak > maxStreak) maxStreak = currentStreak;
+            if (currentStreak >= 3) {
+                const s = document.getElementById('streak-display');
+                s.innerText = `🔥 ${currentStreak} Streak!`;
+                s.style.transform = "scale(1.2)";
+                setTimeout(() => s.style.transform = "scale(1)", 200);
+            }
+        } else {
+            currentStreak = 0;
+            document.getElementById('streak-display').innerText = "";
+        }
+    }
+
+    function undoLast() {
+        if (!canClick || buildResult.length === 0) return;
+        const lastWord = buildResult.pop();
+        const display = document.getElementById('user-build');
+        display.removeChild(display.lastChild);
+        const btns = document.querySelectorAll('#scrambled-words button');
+        for (let b of btns) {
+            if (b.innerText === lastWord && b.disabled) {
+                b.disabled = false;
+                break;
+            }
+        }
+    }
+
+    function resetSentence() {
+        if (!canClick) return;
+        buildResult = [];
+        document.getElementById('user-build').innerHTML = "";
+        document.querySelectorAll('#scrambled-words button').forEach(b => b.disabled = false);
+    }
+
+    function showHint() {
+        document.getElementById('cn-hint-text').innerText = currentItem.cn;
+    }
+
+    function showSummary() {
+        document.getElementById('game-screen').style.display = "none";
+        document.getElementById('summary-screen').style.display = "block";
+        document.getElementById('progress-fill').style.width = "100%";
+        const accuracy = Math.round((initialPoolSize / (initialPoolSize + errorCount)) * 100) || 0;
+        document.getElementById('accuracy-pct').innerText = accuracy + "%";
+        let stars = accuracy === 100 ? "⭐⭐⭐" : accuracy >= 70 ? "⭐⭐" : accuracy >= 50 ? "⭐" : "Try Again!";
+        const starEl = document.getElementById('star-rating');
+        starEl.innerText = stars;
+        starEl.className = accuracy < 50 ? "no-stars" : "";
+        document.getElementById('summary-stats').innerHTML = `Mistakes: ${errorCount}<br>Best Streak: ${maxStreak}<br>Time: ${Math.floor((Date.now() - startTime)/1000)}s`;
+        if (missedItems.length > 0) {
+            document.getElementById('review-container').style.display = "block";
+            const list = document.getElementById('review-list');
+            list.innerHTML = "";
+            missedItems.forEach(item => {
+                const div = document.createElement('div');
+                div.className = "review-item";
+                div.innerHTML = `<div class=\"review-cn\">${item.cn} (${item.py})</div><div class=\"review-mm\">${item.mm}</div>`;
+                list.appendChild(div);
+            });
+        }
+    }
+
+    showMainMenu();
+</script>
+</body>
+</html>
