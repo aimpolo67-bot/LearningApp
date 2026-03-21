@@ -485,36 +485,44 @@
         });
     }
 
-    function handleChoice(selected, btn) {
-        if (!canClick) return;
-        canClick = false;
-        const allBtns = document.querySelectorAll('#options button');
-        allBtns.forEach(b => b.disabled = true);
-        const fb = document.getElementById('feedback');
-        const nextBtn = document.getElementById('next-btn');
+   function handleChoice(selected, btn) {
+    if (!canClick) return;
+    canClick = false;
+    const allBtns = document.querySelectorAll('#options button');
+    allBtns.forEach(b => b.disabled = true);
+    const fb = document.getElementById('feedback');
+    const nextBtn = document.getElementById('next-btn');
 
-        if (selected === currentItem.mm) {
-            btn.classList.add('btn-correct');
-            fb.className = "feedback-correct";
-            fb.innerHTML = `<span>Correct! ✓</span>`;
-            correctCount++;
-            updateStreak(true);
-            nextBtn.style.display = "block";
-        } else {
-            btn.classList.add('btn-wrong'); 
-            allBtns.forEach(b => { if (b.innerText === currentItem.mm) b.classList.add('btn-correct'); });
-            triggerShake();
-            errorCount++;
-            let reIndex = currentIndex + 4;
-            if(reIndex > pool.length) reIndex = pool.length;
-            pool.splice(reIndex, 0, currentItem);
-            if (!missedItems.includes(currentItem)) missedItems.push(currentItem);
-            updateStreak(false);
-            fb.className = "feedback-wrong-box";
-            fb.innerHTML = `<span>✘ Wrong</span><br><span style="font-size:0.9rem;">Correct: ${currentItem.mm}</span>`;
-            nextBtn.style.display = "block";
-        }
+    if (selected === currentItem.mm) {
+        btn.classList.add('btn-correct');
+        fb.className = "feedback-correct";
+        fb.innerHTML = `<span>Correct! ✓</span>`;
+        correctCount++;
+        updateStreak(true);
+        
+        // --- ADDED THIS LINE FOR SUCCESS ---
+        trackActivity(`L2-L1 (Level ${currentLevel})`, currentItem.cn, true);
+        
+        nextBtn.style.display = "block";
+    } else {
+        btn.classList.add('btn-wrong'); 
+        allBtns.forEach(b => { if (b.innerText === currentItem.mm) b.classList.add('btn-correct'); });
+        triggerShake();
+        errorCount++;
+        let reIndex = currentIndex + 4;
+        if(reIndex > pool.length) reIndex = pool.length;
+        pool.splice(reIndex, 0, currentItem);
+        if (!missedItems.includes(currentItem)) missedItems.push(currentItem);
+        updateStreak(false);
+        fb.className = "feedback-wrong-box";
+        fb.innerHTML = `<span>✘ Wrong</span><br><span style="font-size:0.9rem;">Correct: ${currentItem.mm}</span>`;
+        
+        // --- ADDED THIS LINE FOR MISTAKES ---
+        trackActivity(`L2-L1 (Level ${currentLevel})`, currentItem.cn, false);
+        
+        nextBtn.style.display = "block";
     }
+}
 
     function renderScramble() {
         let pinyinParts = shuffleArray(currentItem.pyParts.map((obj, i) => {
@@ -554,6 +562,10 @@
             fb.innerHTML = `<span>Correct! ✓</span><br><small>${currentItem.py}</small>`;
             correctCount++;
             updateStreak(true);
+
+            // --- ADD THIS FOR LEVEL 3 SUCCESS ---
+            trackActivity(`L2-L1 (Level ${currentLevel})`, currentItem.cn, true);
+
             nextBtn.style.display = "block";
         } else {
             triggerShake();
@@ -565,6 +577,10 @@
             updateStreak(false);
             fb.className = "feedback-wrong-box";
             fb.innerHTML = `<span>✘ Wrong Order</span><br><small>Correct: ${correctStr}</small>`;
+
+            // --- ADD THIS FOR LEVEL 3 MISTAKE ---
+            trackActivity(`L2-L1 (Level ${currentLevel})`, currentItem.cn, false);
+
             nextBtn.style.display = "block";
         }
     }
