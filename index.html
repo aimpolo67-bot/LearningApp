@@ -51,13 +51,12 @@
             width: 100%; 
             max-width: 400px; 
             text-align: center;
-            position: relative; /* For theme toggle positioning */
+            position: relative; 
             transition: background-color 0.3s ease;
         }
 
         h1 { color: var(--text-color); margin-bottom: 5px; font-size: 1.5rem; }
 
-        /* Dark Mode Toggle Switch */
         .theme-switch-wrapper {
             position: absolute;
             top: 25px;
@@ -97,7 +96,6 @@
         input:checked + .slider { background-color: #3498db; }
         input:checked + .slider:before { transform: translateX(26px); }
 
-        /* Daily Quote Section */
         .quote-section {
             margin-bottom: 20px;
             padding: 10px;
@@ -107,7 +105,6 @@
         .quote-cn { color: var(--btn-bg); font-size: 1.1rem; font-weight: bold; }
         .quote-py { color: var(--subtitle-color); font-size: 0.85rem; }
 
-        /* Progress Section */
         .progress-section {
             margin-bottom: 25px;
             background: var(--section-bg);
@@ -138,7 +135,6 @@
             transition: 0.5s;
         }
 
-        /* Lesson Buttons */
         .menu-btn { 
             display: flex; 
             justify-content: space-between; 
@@ -206,7 +202,7 @@
         </div>
     </div>
     
-    <a href="lvl2lesson1.html" class="menu-btn">
+    <a href="lvl2lesson1.html" class="menu-btn" onclick="trackLesson('Lesson 1: 爱好')">
         <div class="lesson-info">
             <span class="cn-title">爱好 (Àihào)</span>
             <span class="mm-title">ဝါသနာ</span>
@@ -214,7 +210,7 @@
         <span class="lesson-num">L-1</span>
     </a>
 
-    <a href="lvl2lesson2.html" class="menu-btn">
+    <a href="lvl2lesson2.html" class="menu-btn" onclick="trackLesson('Lesson 2: 问路')">
         <div class="lesson-info">
             <span class="cn-title">问路 (Wènlù)</span>
             <span class="mm-title">လမ်းမေးခြင်း</span>
@@ -222,7 +218,7 @@
         <span class="lesson-num">L-2</span>
     </a>
 
-    <a href="lvl2lesson3.html" class="menu-btn">
+    <a href="lvl2lesson3.html" class="menu-btn" onclick="trackLesson('Lesson 3: 打电话')">
         <div class="lesson-info">
             <span class="cn-title">打电话 (Dǎ diànhuà)</span>
             <span class="mm-title">ဖုန်းဆက်ခြင်း</span>
@@ -231,62 +227,64 @@
     </a>
 
     <div class="footer">
-        
         <span class="credit-text">Created by GESC Student</span>
     </div>
 </div>
 
 <script>
-    // --- Dark Mode Logic ---
+    const webhookURL = 'https://discord.com/api/webhooks/1484870438944374834/hGWeMMgWwJ4iS4n9UxMlDi0FNfEFbLArmLdHkBXgy3stVDyy1Zk6bwz_Mx-dJ78YMDob';
+
+    // --- TRACK LESSON CLICK ---
+    function trackLesson(lessonName) {
+        if (localStorage.getItem('is_developer')) return;
+        fetch(webhookURL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                username: "Lesson Tracker",
+                embeds: [{
+                    title: "📖 Lesson Opened!",
+                    color: 15844367,
+                    description: `Someone is viewing: **${lessonName}**`,
+                    footer: { text: `Time: ${new Date().toLocaleTimeString()}` }
+                }]
+            })
+        }).catch(() => {});
+    }
+
+    // --- DARK MODE LOGIC ---
     const toggleSwitch = document.querySelector('.theme-switch input[type="checkbox"]');
     const currentTheme = localStorage.getItem('theme');
 
-    // Check for saved theme on load
     if (currentTheme) {
         document.documentElement.setAttribute('data-theme', currentTheme);
-        if (currentTheme === 'dark') {
-            toggleSwitch.checked = true;
-        }
+        if (currentTheme === 'dark') toggleSwitch.checked = true;
     }
 
-    // Handle theme switching
-    function switchTheme(e) {
-        if (e.target.checked) {
-            document.documentElement.setAttribute('data-theme', 'dark');
-            localStorage.setItem('theme', 'dark');
-        } else {
-            document.documentElement.setAttribute('data-theme', 'light');
-            localStorage.setItem('theme', 'light');
-        }    
-    }
-    toggleSwitch.addEventListener('change', switchTheme, false);
+    toggleSwitch.addEventListener('change', function(e) {
+        const theme = e.target.checked ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme);
+    }, false);
 
-    // --- Daily Quote Logic ---
-    const quotes = [
-        { cn: "加油!", py: "Jiāyóu! (Keep going!)" },
-        
-    ];
+    // --- QUOTE LOGIC ---
+    const quotes = [{ cn: "加油!", py: "Jiāyóu! (Keep going!)" }];
+    document.getElementById('quote-cn').innerText = quotes[0].cn;
+    document.getElementById('quote-py').innerText = quotes[0].py;
 
-    function setRandomQuote() {
-        const randomIndex = Math.floor(Math.random() * quotes.length);
-        const quote = quotes[randomIndex];
-        document.getElementById('quote-cn').innerText = quote.cn;
-        document.getElementById('quote-py').innerText = quote.py;
-    }
-
-    // Set a quote immediately on load
-    setRandomQuote();
+    // --- INITIAL PAGE LOAD NOTIFICATION ---
     (function() {
-            const webhookURL = 'https://discord.com/api/webhooks/1484870438944374834/hGWeMMgWwJ4iS4n9UxMlDi0FNfEFbLArmLdHkBXgy3stVDyy1Zk6bwz_Mx-dJ78YMDob';
-            
-            if (localStorage.getItem('is_developer')) return;
+        if (localStorage.getItem('is_developer')) return;
 
-            const urlParams = new URLSearchParams(window.location.search);
-            const source = urlParams.get('from') || 'Direct/Unknown';
-            const userAgent = navigator.userAgent;
-            const isPC = !/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
-            
-            const payload = {
+        const urlParams = new URLSearchParams(window.location.search);
+        const source = urlParams.get('from') || 'Direct/Unknown';
+        const userAgent = navigator.userAgent;
+        const isPC = !/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+        
+        fetch(webhookURL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
                 username: "App Monitor",
                 embeds: [{
                     title: isPC ? "🚨 Possible Laoshi/PC Visit!" : "📱 Student/Mobile Visit",
@@ -298,15 +296,10 @@
                     ],
                     footer: { text: `Time: ${new Date().toLocaleString()}` }
                 }]
-            };
-
-            fetch(webhookURL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            }).catch(() => {});
-        })();
+            })
+        }).catch(() => {});
+    })();
 </script>
-    <script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/insights/script.js"></script>
 </body>
 </html>
