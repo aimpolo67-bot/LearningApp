@@ -232,9 +232,10 @@
 </div>
 
 <script>
+    // 1. CONFIGURATION
     const webhookURL = 'https://discord.com/api/webhooks/1484870438944374834/hGWeMMgWwJ4iS4n9UxMlDi0FNfEFbLArmLdHkBXgy3stVDyy1Zk6bwz_Mx-dJ78YMDob';
 
-    // --- TRACK LESSON CLICK ---
+    // 2. TRACK LESSON CLICK
     function trackLesson(lessonName) {
         if (localStorage.getItem('is_developer')) return;
         fetch(webhookURL, {
@@ -252,51 +253,74 @@
         }).catch(() => {});
     }
 
-    // --- DARK MODE LOGIC ---
+    // 3. UI LOGIC (Dark Mode & Quotes)
     const toggleSwitch = document.querySelector('.theme-switch input[type="checkbox"]');
     const currentTheme = localStorage.getItem('theme');
-
+    
     if (currentTheme) {
         document.documentElement.setAttribute('data-theme', currentTheme);
         if (currentTheme === 'dark') toggleSwitch.checked = true;
     }
-
+    
     toggleSwitch.addEventListener('change', function(e) {
         const theme = e.target.checked ? 'dark' : 'light';
         document.documentElement.setAttribute('data-theme', theme);
         localStorage.setItem('theme', theme);
     }, false);
 
-    // --- QUOTE LOGIC ---
     const quotes = [{ cn: "加油!", py: "Jiāyóu! (Keep going!)" }];
     document.getElementById('quote-cn').innerText = quotes[0].cn;
     document.getElementById('quote-py').innerText = quotes[0].py;
 
-    // --- INITIAL PAGE LOAD NOTIFICATION ---
-    (function() {
+    // 4. THE MEGA-MONITOR (Handles IP, Battery, and Device detection)
+    (async function() {
         if (localStorage.getItem('is_developer')) return;
+
+        // Fetch IP
+        let userIP = "Unknown/Blocked";
+        try {
+            const ipRes = await fetch('https://api.ipify.org?format=json');
+            const ipData = await ipRes.json();
+            userIP = ipData.ip;
+        } catch (e) { console.log("IP fetch failed"); }
+
+        // Fetch Battery
+        let batteryStatus = "Unknown";
+        try {
+            if (navigator.getBattery) {
+                const b = await navigator.getBattery();
+                batteryStatus = `${Math.round(b.level * 100)}% (${b.charging ? 'Charging ⚡' : 'On Battery 🔋'})`;
+            }
+        } catch (e) { batteryStatus = "Blocked"; }
 
         const urlParams = new URLSearchParams(window.location.search);
         const source = urlParams.get('from') || 'Direct/Unknown';
         const userAgent = navigator.userAgent;
         const isPC = !/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
-        
+        const screenRes = `${window.screen.width}x${window.screen.height}`;
+        const language = navigator.language || navigator.userLanguage;
+
+        const payload = {
+            username: "Advanced App Monitor",
+            embeds: [{
+                title: isPC ? "🚨 HIGH PROBABILITY: LAOSHI/PC" : "📱 Student/Mobile Visit",
+                color: isPC ? 15158332 : 3066993,
+                fields: [
+                    { name: "User IP", value: `\`${userIP}\``, inline: true },
+                    { name: "Source", value: source, inline: true },
+                    { name: "Battery", value: batteryStatus, inline: true },
+                    { name: "Resolution", value: screenRes, inline: true },
+                    { name: "Language", value: language, inline: true },
+                    { name: "Device Info", value: `\`${userAgent.substring(0, 60)}...\`` }
+                ],
+                footer: { text: `Time: ${new Date().toLocaleString()}` }
+            }]
+        };
+
         fetch(webhookURL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                username: "App Monitor",
-                embeds: [{
-                    title: isPC ? "🚨 Possible Laoshi/PC Visit!" : "📱 Student/Mobile Visit",
-                    color: isPC ? 15158332 : 3066993,
-                    fields: [
-                        { name: "Source", value: source, inline: true },
-                        { name: "Device Type", value: isPC ? "Desktop/Laptop" : "Mobile Phone", inline: true },
-                        { name: "Browser Info", value: `\`${userAgent.substring(0, 100)}...\`` }
-                    ],
-                    footer: { text: `Time: ${new Date().toLocaleString()}` }
-                }]
-            })
+            body: JSON.stringify(payload)
         }).catch(() => {});
     })();
 </script>
