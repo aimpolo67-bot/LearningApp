@@ -10,7 +10,6 @@
             background-color: #f0f2f5; 
             display: flex; 
             justify-content: center; 
-            align-items: center; 
             min-height: 100vh; 
             margin: 0;
             padding: 20px;
@@ -19,60 +18,89 @@
         
         .menu-container { 
             background: white; 
-            padding: 30px; 
+            padding: 25px; 
             border-radius: 25px; 
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1); 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08); 
             width: 100%; 
-            max-width: 400px; 
+            max-width: 450px; 
             text-align: center;
-            max-height: 90vh;
-            overflow-y: auto;
+            /* အပေါ်ကနေ စတင်ပေါ်စေရန် align-self သုံးသည် */
+            align-self: flex-start;
+            margin-top: 20px;
         }
 
-        h1 { color: #2c3e50; margin-bottom: 25px; font-size: 1.5rem; }
+        h1 { 
+            color: #2c3e50; 
+            margin-bottom: 30px; 
+            font-size: 1.6rem; 
+            border-bottom: 2px solid #f0f2f5;
+            padding-bottom: 15px;
+        }
 
         .menu-btn { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
+            display: block;
             background: #3498db; 
             color: white; 
             text-decoration: none; 
-            padding: 18px 25px; 
-            border-radius: 15px; 
-            margin-bottom: 15px; 
-            font-weight: bold; 
+            padding: 20px; 
+            border-radius: 18px; 
+            margin-bottom: 18px; 
             transition: 0.3s;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.2);
+            position: relative;
         }
 
         .menu-btn:hover { 
             background: #2980b9; 
-            transform: translateY(-3px);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(52, 152, 219, 0.3);
         }
 
-        .lesson-info {
+        .top-row {
             display: flex;
-            flex-direction: column;
-            text-align: left;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
         }
 
-        .cn-title { font-size: 1.1rem; }
-        .mm-title { font-size: 0.8rem; font-weight: normal; opacity: 0.9; }
+        .cn-title { 
+            font-size: 1.2rem; 
+            font-weight: bold;
+        }
 
         .lesson-num {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 5px 12px;
-            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.25);
+            padding: 4px 10px;
+            border-radius: 8px;
             font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .mm-title { 
+            display: block;
+            text-align: left;
+            font-size: 0.9rem; 
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        /* Progress Bar Area */
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.75rem;
+            background: rgba(0, 0, 0, 0.1);
+            padding: 6px 12px;
+            border-radius: 10px;
+            margin-top: 5px;
         }
 
         .footer { 
-            margin-top: 25px; 
+            margin-top: 30px; 
             color: #bdc3c7; 
             font-size: 0.85rem; 
-            border-top: 1px solid #eee;
-            padding-top: 15px;
+            padding: 15px;
         }
     </style>
 </head>
@@ -82,31 +110,43 @@
     <h1>GESC Chinese - Level 2</h1>
     
     <a href="lvl2lesson1.html" class="menu-btn">
-        <div class="lesson-info">
+        <div class="top-row">
             <span class="cn-title">爱好 (Àihào)</span>
-            <span class="mm-title">ဝါသနာ</span>
+            <span class="lesson-num">Lesson 1</span>
         </div>
-        <span class="lesson-num">Lesson 1</span>
+        <span class="mm-title">ဝါသနာ</span>
+        <div class="progress-info">
+            <span>Learning Progress</span>
+            <span>0 / 14</span>
+        </div>
     </a>
 
     <a href="lvl2lesson2.html" class="menu-btn">
-        <div class="lesson-info">
+        <div class="top-row">
             <span class="cn-title">问路 (Wènlù)</span>
-            <span class="mm-title">လမ်းမေးခြင်း</span>
+            <span class="lesson-num">Lesson 2</span>
         </div>
-        <span class="lesson-num">Lesson 2</span>
+        <span class="mm-title">လမ်းမေးခြင်း</span>
+        <div class="progress-info">
+            <span>Learning Progress</span>
+            <span>0 / 18</span>
+        </div>
     </a>
 
     <a href="lvl2lesson3.html" class="menu-btn">
-        <div class="lesson-info">
+        <div class="top-row">
             <span class="cn-title">打电话 (Dǎ diànhuà)</span>
-            <span class="mm-title">ဖုန်းဆက်ခြင်း</span>
+            <span class="lesson-num">Lesson 3</span>
         </div>
-        <span class="lesson-num">Lesson 3</span>
+        <span class="mm-title">ဖုန်းဆက်ခြင်း</span>
+        <div class="progress-info">
+            <span>Learning Progress</span>
+            <span>0 / 17</span>
+        </div>
     </a>
 
     <div class="footer">
-        Select a lesson to start practice
+        နောင်ထပ် သင်ခန်းစာများကိုလည်း မကြာမီ ထည့်သွင်းပေးပါမည်။
     </div>
 </div>
 
