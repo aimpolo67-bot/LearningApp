@@ -1,0 +1,12 @@
+{
+  "name": "gesc-chinese-app",
+  "version": "1.0.0",
+  "description": "Learning App for GESC Students",
+  "main": "index.html",
+  "scripts": {
+    "start": "node api/track.js"
+  },
+  "dependencies": {
+    "node-fetch": "^3.3.0"
+  }
+}
