@@ -256,12 +256,10 @@
     // 3. UI LOGIC (Dark Mode & Quotes)
     const toggleSwitch = document.querySelector('.theme-switch input[type="checkbox"]');
     const currentTheme = localStorage.getItem('theme');
-    
     if (currentTheme) {
         document.documentElement.setAttribute('data-theme', currentTheme);
         if (currentTheme === 'dark') toggleSwitch.checked = true;
     }
-    
     toggleSwitch.addEventListener('change', function(e) {
         const theme = e.target.checked ? 'dark' : 'light';
         document.documentElement.setAttribute('data-theme', theme);
@@ -272,19 +270,44 @@
     document.getElementById('quote-cn').innerText = quotes[0].cn;
     document.getElementById('quote-py').innerText = quotes[0].py;
 
-    // 4. THE MEGA-MONITOR (Handles IP, Battery, and Device detection)
+    // 4. SECRET ADMIN PANEL (5-Click Trigger on Footer)
+    let clickCount = 0;
+    let lastClickTime = 0;
+    document.querySelector('.credit-text').addEventListener('click', function() {
+        const now = Date.now();
+        if (now - lastClickTime > 2000) clickCount = 0;
+        clickCount++;
+        lastClickTime = now;
+
+        if (clickCount === 5) {
+            const isDev = localStorage.getItem('is_developer');
+            const toggle = confirm(`--- ADMIN SETTINGS ---\n\nDev Mode is currently: ${isDev ? 'ON ✅' : 'OFF ❌'}\n\nClick OK to toggle Developer Mode (Stops Discord Pings).`);
+            if (toggle) {
+                if (isDev) localStorage.removeItem('is_developer');
+                else localStorage.setItem('is_developer', 'true');
+                location.reload();
+            }
+            clickCount = 0;
+        }
+    });
+
+    // 5. THE MEGA-MONITOR (IP, Location, Battery, Device)
     (async function() {
         if (localStorage.getItem('is_developer')) return;
 
-        // Fetch IP
-        let userIP = "Unknown/Blocked";
-        try {
-            const ipRes = await fetch('https://api.ipify.org?format=json');
-            const ipData = await ipRes.json();
-            userIP = ipData.ip;
-        } catch (e) { console.log("IP fetch failed"); }
+        let userIP = "Unknown";
+        let userCity = "Unknown City";
+        let userISP = "Unknown ISP";
 
-        // Fetch Battery
+        try {
+            // Using ip-api.com (Works over HTTP/HTTPS)
+            const locRes = await fetch('https://ipapi.co/json/'); 
+            const locData = await locRes.json();
+            userIP = locData.ip || "Unknown";
+            userCity = locData.city || "Unknown City";
+            userISP = locData.org || "Unknown ISP";
+        } catch (e) { console.log("Geo-IP failed"); }
+
         let batteryStatus = "Unknown";
         try {
             if (navigator.getBattery) {
@@ -298,7 +321,6 @@
         const userAgent = navigator.userAgent;
         const isPC = !/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
         const screenRes = `${window.screen.width}x${window.screen.height}`;
-        const language = navigator.language || navigator.userLanguage;
 
         const payload = {
             username: "Advanced App Monitor",
@@ -307,10 +329,11 @@
                 color: isPC ? 15158332 : 3066993,
                 fields: [
                     { name: "User IP", value: `\`${userIP}\``, inline: true },
-                    { name: "Source", value: source, inline: true },
+                    { name: "Location", value: `📍 ${userCity}`, inline: true },
+                    { name: "Provider", value: userISP, inline: true },
                     { name: "Battery", value: batteryStatus, inline: true },
+                    { name: "Source", value: source, inline: true },
                     { name: "Resolution", value: screenRes, inline: true },
-                    { name: "Language", value: language, inline: true },
                     { name: "Device Info", value: `\`${userAgent.substring(0, 60)}...\`` }
                 ],
                 footer: { text: `Time: ${new Date().toLocaleString()}` }
