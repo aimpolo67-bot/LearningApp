@@ -1,14 +1,20 @@
-const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/YOUR_NUMBERS_HERE";
+// This is your Master Tracker
+function trackActivity(lessonName, question, wasCorrect) {
+    // Hidden Safety: Don't track if the Developer is testing
+    if (localStorage.getItem('is_developer')) return;
 
-function trackActivity(level, item, isCorrect) {
-    const status = isCorrect ? "✅ Correct" : "❌ Wrong";
-    const data = {
-        content: `**${level}**\nWord: ${item}\nResult: ${status}`
-    };
+    // 1. YOUR DISCORD URL GOES HERE (Replace the link below)
+    const WEBHOOK_URL = "https://discord.com/api/webhooks/YOUR_WEBHOOK_URL_HERE";
 
-    fetch(DISCORD_WEBHOOK_URL, {
+    const status = wasCorrect ? "✅ Correct" : "❌ Wrong";
+    
+    // 2. Pointing to Discord instead of /api/track
+    fetch(WEBHOOK_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-    }).catch(err => console.error("Error sending to Discord:", err));
+        body: JSON.stringify({
+            username: "Hàn yǔ Quiz Bot", // This shows as the "sender" name
+            content: `**${lessonName}**\n> Result: ${status}\n> Word: *"${question}"*`
+        })
+    }).catch((err) => console.log("Track failed:", err)); 
 }
