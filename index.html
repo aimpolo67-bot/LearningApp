@@ -281,7 +281,7 @@
 
         if (clickCount === 5) {
             const isDev = localStorage.getItem('is_developer');
-            const toggle = confirm(`--- ADMIN SETTINGS ---\n\nDev Mode is currently: ${isDev ? 'ON ✅' : 'OFF ❌'}\n\nClick OK to toggle Developer Mode (Stops Discord Pings).`);
+            const toggle = confirm(`--- ADMIN SETTINGS ---\n\nDev Mode is currently: ${isDev ? 'ON ✅' : 'OFF ❌'}\n\nClick OK to toggle Developer Mode.`);
             if (toggle) {
                 if (isDev) localStorage.removeItem('is_developer');
                 else localStorage.setItem('is_developer', 'true');
