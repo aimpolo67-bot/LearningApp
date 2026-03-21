@@ -633,28 +633,41 @@
     }
 
     function showSummary() {
-        document.getElementById('game-screen').style.display = "none";
-        document.getElementById('summary-screen').style.display = "block";
-        document.getElementById('progress-fill').style.width = "100%";
-        const accuracy = Math.round((initialPoolSize / (initialPoolSize + errorCount)) * 100) || 0;
-        document.getElementById('accuracy-pct').innerText = accuracy + "%";
-        let stars = accuracy === 100 ? "⭐⭐⭐" : accuracy >= 70 ? "⭐⭐" : accuracy >= 50 ? "⭐" : "Try Again!";
-        const starEl = document.getElementById('star-rating');
-        starEl.innerText = stars;
-        starEl.className = accuracy < 50 ? "no-stars" : "";
-        document.getElementById('summary-stats').innerHTML = `Mistakes: ${errorCount}<br>Best Streak: ${maxStreak}<br>Time: ${Math.floor((Date.now() - startTime)/1000)}s`;
-        if (missedItems.length > 0) {
-            document.getElementById('review-container').style.display = "block";
-            const list = document.getElementById('review-list');
-            list.innerHTML = "";
-            missedItems.forEach(item => {
-                const div = document.createElement('div');
-                div.className = "review-item";
-                div.innerHTML = `<div class=\"review-cn\">${item.cn} (${item.py})</div><div class=\"review-mm\">${item.mm}</div>`;
-                list.appendChild(div);
-            });
-        }
+    document.getElementById('game-screen').style.display = "none";
+    document.getElementById('summary-screen').style.display = "block";
+    document.getElementById('progress-fill').style.width = "100%";
+
+    const accuracy = Math.round((initialPoolSize / (initialPoolSize + errorCount)) * 100) || 0;
+    const timeSpent = Math.floor((Date.now() - startTime) / 1000);
+
+    // --- TRACKER INTEGRATION ---
+    trackActivity(
+        `FINISH: Level ${currentLevel}`, 
+        `Accuracy: ${accuracy}% | Mistakes: ${errorCount} | Time: ${timeSpent}s`, 
+        accuracy >= 80
+    );
+    // ---------------------------
+
+    document.getElementById('accuracy-pct').innerText = accuracy + "%";
+    let stars = accuracy === 100 ? "⭐⭐⭐" : accuracy >= 70 ? "⭐⭐" : accuracy >= 50 ? "⭐" : "Try Again!";
+    const starEl = document.getElementById('star-rating');
+    starEl.innerText = stars;
+    starEl.className = accuracy < 50 ? "no-stars" : "";
+    
+    document.getElementById('summary-stats').innerHTML = `Mistakes: ${errorCount}<br>Best Streak: ${maxStreak}<br>Time: ${timeSpent}s`;
+    
+    if (missedItems.length > 0) {
+        document.getElementById('review-container').style.display = "block";
+        const list = document.getElementById('review-list');
+        list.innerHTML = "";
+        missedItems.forEach(item => {
+            const div = document.createElement('div');
+            div.className = "review-item";
+            div.innerHTML = `<div class="review-cn">${item.cn} (${item.py})</div><div class="review-mm">${item.mm}</div>`;
+            list.appendChild(div);
+        });
     }
+}
 
     showMainMenu();
 </script>
