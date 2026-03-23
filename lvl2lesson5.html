@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <script src="tracker.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Level 2 Lesson 5: 天气 (Tiānqì) - မိုးလေဝသ</title>
+    
+    <style>
+        /* Dark Mode Variables */
+        :root {
+            --bg-color: #f0f2f5;
+            --card-bg: white;
+            --text-main: #2c3e50;
+            --text-sub: #7f8c8d;
+            --border: #eee;
+            --section-bg: #ecf0f1;
+            --nav-bg: white;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #1a1a1a;
+            --card-bg: #2d2d2d;
+            --text-main: #ecf0f1;
+            --text-sub: #bdc3c7;
+            --border: #444;
+            --section-bg: #383838;
+            --nav-bg: #2d2d2d;
+        }
+
+        body { 
+            font-family: sans-serif; 
+            background-color: var(--bg-color); 
+            color: var(--text-main);
+            display: flex; 
+            justify-content: center; 
+            padding: 15px; 
+            padding-bottom: 80px; 
+            margin: 0; 
+            transition: background-color 0.3s;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+        }
+
+        .home-icon-btn {
+            text-decoration: none;
+            background: var(--nav-bg);
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            font-size: 1.8rem;
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 2px solid #3498db;
+        }
+
+        .home-icon-btn:hover {
+            transform: scale(1.1);
+            background: #f0f7ff;
+        }
+
+        #quiz-container { 
+            background: var(--card-bg); 
+            padding: 20px; 
+            border-radius: 20px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
+            width: 100%; 
+            max-width: 500px; 
+            text-align: center; 
+            position: relative; 
+            overflow: hidden; 
+            transition: transform 0.1s, background-color 0.3s; 
+        }
+
+        #progress-wrapper { width: 100%; height: 8px; background: var(--border); border-radius: 4px; margin-bottom: 10px; overflow: hidden; }
+        #progress-fill { height: 100%; width: 0%; background: #2ecc71; transition: width 0.3s ease; }
+        #streak-display { font-size: 1.2rem; margin-bottom: 5px; min-height: 1.5rem; transition: transform 0.2s; }
+        .level-header { background: #2c3e50; color: white; padding: 10px; border-radius: 10px; margin-bottom: 5px; font-weight: bold; }
+        .progress-sub { font-size: 0.85rem; color: var(--text-main); margin-bottom: 15px; background: var(--section-bg); padding: 5px; border-radius: 5px; font-weight: bold; }
+        
+        .display-area { margin: 15px 0; min-height: 3rem; border-bottom: 2px solid var(--border); padding-bottom: 10px; }
+        .chinese-display { font-size: 1.8rem; color: var(--text-main); font-weight: bold; line-height: 1.3; }
+        .pinyin-display { font-size: 1rem; color: var(--text-sub); font-style: italic; }
+        
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+        .scrambled-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 20px; }
+        
+        button { padding: 12px; border: 2px solid #3498db; background: var(--card-bg); color: var(--text-main); border-radius: 10px; cursor: pointer; font-size: 0.95rem; transition: 0.1s; outline: none; }
+        button:disabled { cursor: default; }
+        
+        .pinyin-part { border-color: #e67e22; color: #d35400; font-style: italic; }
+        [data-theme="dark"] .pinyin-part { color: #ff9f43; border-color: #e67e22; }
+        
+        .pinyin-part.part-noun { border-color: #3498db; color: #2980b9; }
+        .pinyin-part.part-verb { border-color: #9b59b6; color: #8e44ad; }
+        .pinyin-part.part-particle { border-color: #95a5a6; color: #7f8c8d; }
+        
+        .pinyin-part:disabled { background: var(--section-bg) !important; border: 2px dashed #bdc3c7 !important; color: #bdc3c7 !important; opacity: 0.5; transform: scale(0.9); }
+        .btn-correct { background: #2ecc71 !important; color: white !important; border-color: #27ae60 !important; }
+        .btn-wrong { background: #e74c3c !important; color: white !important; border-color: #c0392b !important; }
+        
+        #feedback { margin-top: 15px; font-weight: bold; min-height: 45px; padding: 10px; border-radius: 10px; line-height: 1.4; transition: background 0.2s; }
+        .feedback-correct { background: #eafff0 !important; border: 1px solid #2ecc71; }
+        [data-theme="dark"] .feedback-correct { background: #1b4d2e !important; color: #fff; }
+        
+        .feedback-wrong-box { background: #fff5f5 !important; border: 1px solid #e74c3c; }
+        [data-theme="dark"] .feedback-wrong-box { background: #4d1b1b !important; color: #fff; }
+
+        #user-build { color: #2980b9; font-size: 1.2rem; font-style: italic; margin: 10px 0; min-height: 2.5rem; max-height: 120px; overflow-y: auto; border: 1px dashed #3498db; padding: 10px; border-radius: 5px; background: var(--section-bg); display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 5px; transition: all 0.2s; }
+        
+        #lvl3-controls { margin-top: 25px; display: flex; justify-content: center; gap: 10px; }
+        .reset-btn { background: #e67e22; color: white; border: none; padding: 10px 22px; border-radius: 5px; font-weight: bold; cursor: pointer; }
+        .undo-btn { background: #34495e; color: white; border: none; padding: 10px 22px; border-radius: 5px; font-weight: bold; cursor: pointer; }
+        .hint-btn { background: #f1c40f; color: #2c3e50; border: none; padding: 10px 22px; border-radius: 5px; font-weight: bold; cursor: pointer; }
+        
+        .next-btn { background: #2ecc71; color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; width: 100%; cursor: pointer; margin-top: 10px; display: none; }
+        .menu-btn { background: #3498db; color: white; font-size: 1.1rem; border: none; padding: 15px; border-radius: 10px; font-weight: bold; margin-bottom: 10px; width: 100%; cursor: pointer; }
+        .home-btn { margin-top: 25px; background: #95a5a6; color: white; border: none; width: 100%; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        
+        #summary-screen { display: none; padding: 20px; }
+        .stat-circle { width: 100px; height: 100px; border-radius: 50%; border: 5px solid #2ecc71; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; margin: 10px auto; color: #2ecc71; }
+        #star-rating { font-size: 2.5rem; color: #f1c40f; margin-bottom: 10px; letter-spacing: 5px; min-height: 3rem; }
+        
+        #review-container { margin-top: 20px; text-align: left; background: var(--section-bg); padding: 15px; border-radius: 10px; border: 1px solid var(--border); max-height: 200px; overflow-y: auto; }
+        .review-item { margin-bottom: 10px; border-bottom: 1px solid var(--border); padding-bottom: 5px; }
+        .review-cn { font-weight: bold; color: var(--text-main); }
+        .review-mm { color: var(--text-sub); font-size: 0.9rem; }
+        
+        @keyframes shake { 0% { transform: translateX(0); } 25% { transform: translateX(-8px); } 50% { transform: translateX(8px); } 75% { transform: translateX(-8px); } 100% { transform: translateX(0); } }
+        .shake { animation: shake 0.3s ease-in-out; }
+    </style>
+</head>
+<body>
+
+    <div id="quiz-container">
+        <div id="menu-screen">
+            <h2 id="app-title" style="color: var(--text-main);">Level 2 Lesson 5: 天气 (Tiānqì) - မိုးလေဝသ</h2>
+            <div id="main-menu">
+                <button class="menu-btn" onclick="goToLevel(1)">Shēngcí (生词)</button>
+                <button class="menu-btn" onclick="goToLevel(2)">Duìhuà (对话)</button>
+                <button class="menu-btn" onclick="goToLevel(3)">Páijùzi (排句子)</button>
+            </div>
+        </div>
+
+        <div id="game-screen" style="display:none;">
+            <div id="progress-wrapper"><div id="progress-fill"></div></div>
+            <div id="streak-display"></div>
+            <div class="level-header" id="level-tag">--</div>
+            <div class="progress-sub" id="progress-info">--</div>
+            
+            <div id="level-1-2-ui">
+                <div class="display-area">
+                    <div class="chinese-display" id="cn-q">--</div>
+                    <div class="pinyin-display" id="py-q">--</div>
+                </div>
+            </div>
+
+            <div id="level-3-ui" style="display:none;">
+                <div style="color: var(--text-sub); font-size: 1.1rem; margin-bottom: 5px; min-height: 1.5rem;" id="cn-hint-text"></div>
+                <div style="color: var(--text-main); font-size: 1.4rem; font-weight: bold; margin-bottom: 10px;" id="mm-hint">--</div>
+                <div id="user-build"></div>
+            </div>
+
+            <div class="options-grid" id="options"></div>
+            <div class="scrambled-grid" id="scrambled-words"></div>
+            
+            <div id="lvl3-controls" style="display:none;">
+                <button class="undo-btn" id="undo-btn" onclick="undoLast()">Undo</button>
+                <button class="reset-btn" id="reset-btn" onclick="resetSentence()">Reset</button>
+                <button class="hint-btn" id="hint-btn" onclick="showHint()">Hint</button>
+            </div>
+
+            <div id="feedback"></div>
+            <button id="next-btn" class="next-btn" onclick="autoNext()">Next Question ➔</button>
+            <button class="home-btn" onclick="showMainMenu()">🏠 Back to Lesson Menu</button>
+        </div>
+
+        <div id="summary-screen">
+            <h2 style="color: var(--text-main);">Lesson Finished!</h2>
+            <div id="star-rating"></div>
+            <div class="stat-circle" id="accuracy-pct">0%</div>
+            <p id="summary-stats" style="color: var(--text-sub); line-height: 1.6;"></p>
+            
+            <div id="review-container" style="display:none;">
+                <div style="font-weight: bold; margin-bottom: 10px; color: #e74c3c;">Review Mistakes:</div>
+                <div id="review-list"></div>
+            </div>
+
+            <button class="menu-btn" onclick="showMainMenu()" style="margin-top:15px;">Back to Lesson Menu</button>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <a href="index.html" class="home-icon-btn" title="Back to Main Menu">🏠</a>
+    </div>
+
+<script>
+    // --- Dark Mode Logic ---
+    const currentTheme = localStorage.getItem('theme');
+    if (currentTheme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+    }
+
+    const CONFIG = {
+    title: "Level 2 Lesson 5: 天气 (Tiānqì) - မိုးလေဝသ",
+    vocab: [
+        { cn: "季节", py: "jìjié", mm: "ရာသီဥတု (Season)" },
+        { cn: "春天", py: "chūntiān", mm: "နွေဦးရာသီ" },
+        { cn: "夏天", py: "xiàtiān", mm: "နွေရာသီ" },
+        { cn: "秋天", py: "qiūtiān", mm: "ဆောင်းဦးရာသီ" },
+        { cn: "冬天", py: "dōngtiān", mm: "ဆောင်းရာသီ" },
+        { cn: "天气", py: "tiānqì", mm: "မိုးလေဝသ (Weather)" },
+        { cn: "暖和", py: "nuǎnhuo", mm: "နွေးထွေးသော" },
+        { cn: "冷", py: "lěng", mm: "အေးသော" },
+        { cn: "热", py: "rè", mm: "ပူသော" },
+        { cn: "凉快", py: "liángshuǎng", mm: "အေးမြသော" },
+        { cn: "雨季", py: "yǔjì", mm: "မိုးရာသီ" },
+        { cn: "天气预报", py: "tiānqì yùbào", mm: "မိုးလေဝသခန့်မှန်းချက်" },
+        { cn: "下雨", py: "xiàyǔ", mm: "မိုးရွာသည်" },
+        { cn: "雨伞", py: "yǔsǎn", mm: "ထီး" },
+        { cn: "雨衣", py: "yǔyī", mm: "မိုးကာအင်္ကျီ" },
+        { cn: "晴天", py: "qíngtiān", mm: "နေသာသောနေ့" },
+        { cn: "阴天", py: "yīntiān", mm: "မိုးအုံ့သောနေ့" },
+        { cn: "怕", py: "pà", mm: "ကြောက်သည်" },
+        { cn: "暑假", py: "shǔjià", mm: "နွေရာသီကျောင်းပိတ်ရက်" },
+        { cn: "海边", py: "hǎibiān", mm: "ပင်လယ်ကမ်းခြေ" },
+        { cn: "玩", py: "wán", mm: "ကစားသည် / အလည်သွားသည်" },
+        { cn: "天空", py: "tiānkōng", mm: "မိုးကောင်းကင်" },
+        { cn: "汗", py: "hàn", mm: "ချွေး" },
+        { cn: "台风", py: "táifēng", mm: "တိုင်ဖွန်းမုန်တိုင်း" },
+        { cn: "打雷", py: "dǎléi", mm: "မိုးကျိုးပစ်သည်" },
+        { cn: "中暑", py: "zhòngshǔ", mm: "အပူလျှပ်သည်" }
+    ],
+    sentences: [
+        { 
+            cn: "中国有几个季节？", 
+            py: "Zhōngguó yǒu jǐ ge jìjié?", 
+            mm: "တရုတ်ပြည်မှာ ရာသီဥတု ဘယ်နှစ်ခုရှိလဲ?", 
+            pyParts: [{w:"Zhōngguó"}, {w:"yǒu"}, {w:"jǐ ge"}, {w:"jìjié?"}] 
+        },
+        { 
+            cn: "中国有四个季节：春天，夏天，秋天和冬天。", 
+            py: "Zhōngguó yǒu sì ge jìjié: chūntiān, xiàtiān, qiūtiān hé dōngtiān.", 
+            mm: "တရုတ်ပြည်မှာ ရာသီဥတု ၄ ခုရှိတယ်: နွေဦး၊ နွေ၊ ဆောင်းဦး နဲ့ ဆောင်းရာသီ။", 
+            pyParts: [{w:"Zhōngguó"}, {w:"yǒu sì ge"}, {w:"jìjié:"}, {w:"chūntiān,"}, {w:"xiàtiān,"}, {w:"qiūtiān"}, {w:"hé"}, {w:"dōngtiān."}] 
+        },
+        { 
+            cn: "每个季节的天气怎么样？", 
+            py: "Měi ge jìjié de tiānqì zěnmeyàng?", 
+            mm: "ရာသီဥတုတစ်ခုချင်းစီရဲ့ မိုးလေဝသက ဘယ်လိုလဲ?", 
+            pyParts: [{w:"Měi ge"}, {w:"jìjié de"}, {w:"tiānqì"}, {w:"zěnmeyàng?"}] 
+        },
+        { 
+            cn: "春天暖和、夏天热、秋天凉爽、冬天冷。", 
+            py: "Chūntiān nuǎnhuo, xiàtiān rè, qiūtiān liángshuǎng, dōngtiān lěng.", 
+            mm: "နွေဦးက နွေးထွေးတယ်၊ နွေရာသီက ပူတယ်၊ ဆောင်းဦးက အေးမြတယ်၊ ဆောင်းရာသီက အေးတယ်။", 
+            pyParts: [{w:"Chūntiān"}, {w:"nuǎnhuo,"}, {w:"xiàtiān"}, {w:"rè,"}, {w:"qiūtiān"}, {w:"liángshuǎng,"}, {w:"dōngtiān"}, {w:"lěng."}] 
+        },
+        { 
+            cn: "缅甸有什么季节？", 
+            py: "Miǎndiàn yǒu shénme jìjié?", 
+            mm: "မြန်မာပြည်မှာ ရာသီဥတု ဘယ်နှစ်ခုရှိလဲ?", 
+            pyParts: [{w:"Miǎndiàn"}, {w:"yǒu"}, {w:"shénme"}, {w:"jìjié?"}] 
+        },
+        { 
+            cn: "今天天气怎么样？", 
+            py: "Jīntiān tiānqì zěnmeyàng?", 
+            mm: "ဒီနေ့ မိုးလေဝသက ဘယ်လိုလဲ?", 
+            pyParts: [{w:"Jīntiān"}, {w:"tiānqì"}, {w:"zěnmeyàng?"}] 
+        },
+        { 
+            cn: "天气预报说：下午可能会下雨。", 
+            py: "Tiānqì yùbào shuō: xiàwǔ kěnéng huì xiàyǔ.", 
+            mm: "မိုးလေဝသခန့်မှန်းချက်အရ: နေ့လည်ပိုင်းမှာ မိုးရွာနိုင်တယ်။", 
+            pyParts: [{w:"Tiānqì"}, {w:"yùbào"}, {w:"shuō:"}, {w:"xiàwǔ"}, {w:"kěnéng"}, {w:"huì"}, {w:"xiàyǔ."}] 
+        },
+        { 
+            cn: "你带雨伞了吗？", 
+            py: "Nǐ dài yǔsǎn le ma?", 
+            mm: "မင်း ထီး ပါလား?", 
+            pyParts: [{w:"Nǐ"}, {w:"dài"}, {w:"yǔsǎn"}, {w:"le"}, {w:"ma?"}] 
+        },
+        { 
+            cn: "我带了雨衣。", 
+            py: "Wǒ dài le yǔyī.", 
+            mm: "ငါ မိုးကာအင်္ကျီ ပါပါတယ်။", 
+            pyParts: [{w:"Wǒ"}, {w:"dài le"}, {w:"yǔyī."}] 
+        },
+        { 
+            cn: "你喜欢什么天气？", 
+            py: "Nǐ xǐhuān shénme tiānqì?", 
+            mm: "မင်း ဘယ်လိုမိုးလေဝသမျိုးကို ကြိုက်လဲ?", 
+            pyParts: [{w:"Nǐ"}, {w:"xǐhuān"}, {w:"shénme"}, {w:"tiānqì?"}] 
+        },
+        { 
+            cn: "缅甸有三个季节：夏天、雨季和冬天。", 
+            py: "Miǎndiàn yǒu sān ge jìjié: xiàtiān, yǔjì hé dōngtiān.", 
+            mm: "မြန်မာပြည်မှ ရာသီဥတု ၃ ခုရှိတယ်: နွေရာသီ၊ မိုးရာသီ နဲ့ ဆောင်းရာသီ။", 
+            pyParts: [{w:"Miǎndiàn"}, {w:"yǒu sān ge"}, {w:"jìjié:"}, {w:"xiàtiān,"}, {w:"yǔjì"}, {w:"hé"}, {w:"dōngtiān."}] 
+        },
+        { 
+            cn: "我喜欢晴天，因为我有打算去海边玩。", 
+            py: "Wǒ xǐhuān qíngtiān, yīnwèi wǒ yǒu dǎsuàn qù hǎibiān wán.", 
+            mm: "ငါနေသာတဲ့နေ့ကို ကြိုက်တယ်၊ ဘာလို့လဲဆိုတော့ ငါ ပင်လယ်ကမ်းခြေကို အလည်သွားဖို့ ရည်ရွယ်ထားရှိတယ်။", 
+            pyParts: [{w:"Wǒ"}, {w:"xǐhuān"}, {w:"qíngtiān,"}, {w:"yīnwèi"}, {w:"wǒ yǒu"}, {w:"dǎsuàn"}, {w:"qù"}, {w:"hǎibiān"}, {w:"wán."}] 
+        },
+        { 
+            cn: "我喜欢阴天，因为我怕热。", 
+            py: "Wǒ xǐhuān yīntiān, yīnwèi wǒ pà rè.", 
+            mm: "ငါက မိုးအုံ့တဲ့နေ့ကို ကြိုက်တယ်၊ ဘာလို့လဲဆိုတော့ ငါက အပူကြောက်လို့။", 
+            pyParts: [{w:"Wǒ"}, {w:"xǐhuān"}, {w:"yīntiān,"}, {w:"yīnwèi"}, {w:"wǒ"}, {w:"pà rè."}] 
+        },
+        { 
+            cn: "今年的暑假你有什么安排？", 
+            py: "Jīnnián de shǔjià nǐ yǒu shénme ānpái?", 
+            mm: "ဒီနှစ် နွေရာသီကျောင်းပိတ်ရက်မှာ မင်း ဘာအစီအစဉ်ရှိလဲ?", 
+            pyParts: [{w:"Jīnnián de"}, {w:"shǔjià"}, {w:"nǐ"}, {w:"yǒu shénme"}, {w:"ānpái?"}] 
+        },
+        { 
+            cn: "小鸟在天空上飞来飞去。", 
+            py: "Xiǎoniǎo zài tiānkōng shàng fēi lái fēi qù.", 
+            mm: "ငှက်ကလေးတွေ ကောင်းကင်ပေါ်မှာ ပျံသွားပျံလာ ပျံသန်းနေကြသည်။", 
+            pyParts: [{w:"Xiǎoniǎo"}, {w:"zài"}, {w:"tiānkōng"}, {w:"shàng"}, {w:"fēi lái"}, {w:"fēi qù."}] 
+        },
+        { 
+            cn: "我一紧张就出汗。", 
+            py: "Wǒ yī jǐnzhāng jiù chūhàn.", 
+            mm: "ငါ စိတ်လှုပ်ရှားတာနဲ့ ချွေးထွက်လာတယ်။", 
+            pyParts: [{w:"Wǒ"}, {w:"yī"}, {w:"jǐnzhāng"}, {w:"jiù"}, {w:"chūhàn."}] 
+        },
+        { 
+            cn: "天气预报说下周会有台风。", 
+            py: "Tiānqì yùbào shuō xiàzhōu huì yǒu táifēng.", 
+            mm: "မိုးလေဝသခန့်မှန်းချက်အရ နောက်အပတ်မှာ မုန်တိုင်းရှိမယ်လို့ ပြောတယ်။", 
+            pyParts: [{w:"Tiānqì"}, {w:"yùbào"}, {w:"shuō"}, {w:"xiàzhōu"}, {w:"huì yǒu"}, {w:"táifēng."}] 
+        },
+        { 
+            cn: "今天很热，所以我出了很多汗。", 
+            py: "Jīntiān hěn rè, suǒyǐ wǒ chūle hěnduō hàn.", 
+            mm: "ဒီနေ့ အရမ်းပူတယ်၊ ဒါကြောင့် ငါ ချွေးတွေ အများကြီး ထွက်လာတယ်။", 
+            pyParts: [{w:"Jīntiān"}, {w:"hěn rè,"}, {w:"suǒyǐ"}, {w:"wǒ"}, {w:"chūle"}, {w:"hěnduō"}, {w:"hàn."}] 
+        },
+        { 
+            cn: "下周有台风，所以学校放假。", 
+            py: "Xiàzhōu yǒu táifēng, suǒyǐ xuéxiào fàngjià.", 
+            mm: "နောက်အပတ်မှာ မုန်တိုင်းရှိလို့ ကျောင်းပိတ်တယ်။", 
+            pyParts: [{w:"Xiàzhōu"}, {w:"yǒu"}, {w:"táifēng,"}, {w:"suǒyǐ"}, {w:"xuéxiào"}, {w:"fàngjià."}] 
+        },
+        { 
+            cn: "我很害怕打雷声。", 
+            py: "Wǒ hěn hàipà dǎléishēng.", 
+            mm: "ငါ မိုးကျိုးပစ်သံကို အရမ်းကြောက်တယ်။", 
+            pyParts: [{w:"Wǒ"}, {w:"hěn"}, {w:"hàipà"}, {w:"dǎléishēng."}] 
+        },
+        { 
+            cn: "他中暑了，所以在家休息。", 
+            py: "Tā zhòngshǔle, suǒyǐ zài jiā xiūxi.", 
+            mm: "သူ အပူလျှပ်သွားလို့ အိမ်မှာ အနားယူနေတယ်။", 
+            pyParts: [{w:"Tā"}, {w:"zhòngshǔle,"}, {w:"suǒyǐ"}, {w:"zài jiā"}, {w:"xiūxi."}] 
+        },
+        { 
+            cn: "夏天很容易中暑，大家要小心。", 
+            py: "Xiàtiān hěn róngyì zhòngshǔ, dàjiā yào xiǎoxīn.", 
+            mm: "နွေရာသီမှာ အပူလျှပ်ဖို့ အရမ်းလွယ်ကူတယ်၊ အားလုံးပဲ သတိထားကြပါ။", 
+            pyParts: [{w:"Xiàtiān"}, {w:"hěn róngyì"}, {w:"zhòngshǔ,"}, {w:"dàjiā"}, {w:"yào"}, {w:"xiǎoxīn."}] 
+        }
+    ]
+};
+
+
+    // Rest of your game logic is untouched below...
+    let currentLevel = 1, pool = [], currentIndex = 0, currentItem = {}, buildResult = [], canClick = true;
+    let errorCount = 0, correctCount = 0, currentStreak = 0, maxStreak = 0, startTime = 0;
+    let missedItems = [], initialPoolSize = 0;
+
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    function triggerShake() {
+        const container = document.getElementById('quiz-container');
+        container.classList.add('shake');
+        setTimeout(() => container.classList.remove('shake'), 300);
+    }
+
+    function showMainMenu() {
+        document.getElementById('menu-screen').style.display = "block";
+        document.getElementById('game-screen').style.display = "none";
+        document.getElementById('summary-screen').style.display = "none";
+    }
+
+    function goToLevel(lvl) {
+        currentLevel = lvl; currentIndex = 0; errorCount = 0; correctCount = 0; currentStreak = 0; maxStreak = 0;
+        missedItems = []; startTime = Date.now();
+        document.getElementById('menu-screen').style.display = "none";
+        document.getElementById('game-screen').style.display = "block";
+        document.getElementById('summary-screen').style.display = "none";
+        let rawPool = (lvl === 1) ? [...CONFIG.vocab] : [...CONFIG.sentences];
+        pool = shuffleArray(rawPool);
+        initialPoolSize = pool.length;
+        if (lvl === 1) { document.getElementById('level-tag').innerText = "Shēngcí (生词)"; document.getElementById('lvl3-controls').style.display = "none"; }
+        else if (lvl === 2) { document.getElementById('level-tag').innerText = "Duìhuà (对话)"; document.getElementById('lvl3-controls').style.display = "none"; }
+        else { document.getElementById('level-tag').innerText = "Páijùzi (排句子)"; document.getElementById('lvl3-controls').style.display = "flex"; }
+        updateQuestion();
+    }
+
+    function updateQuestion() {
+        canClick = true;
+        document.getElementById('next-btn').style.display = "none";
+        const fb = document.getElementById('feedback');
+        fb.innerText = ""; fb.className = ""; fb.style.background = "transparent";
+        document.getElementById('user-build').innerHTML = "";
+        document.getElementById('options').innerHTML = "";
+        document.getElementById('scrambled-words').innerHTML = "";
+        document.getElementById('cn-hint-text').innerText = "";
+        
+        if(currentLevel === 3) {
+            document.getElementById('undo-btn').disabled = false;
+            document.getElementById('reset-btn').disabled = false;
+            document.getElementById('hint-btn').disabled = false;
+        }
+
+        buildResult = [];
+        const progressPct = Math.min(((currentIndex) / initialPoolSize) * 100, 99);
+        document.getElementById('progress-fill').style.width = progressPct + "%";
+        document.getElementById('progress-info').innerText = `Item: ${currentIndex + 1} / ${pool.length}`;
+        currentItem = pool[currentIndex];
+        if (currentLevel < 3) {
+            document.getElementById('level-1-2-ui').style.display = "block";
+            document.getElementById('level-3-ui').style.display = "none";
+            document.getElementById('cn-q').innerText = currentItem.cn;
+            document.getElementById('py-q').innerText = currentItem.py;
+            renderOptions();
+        } else {
+            document.getElementById('level-1-2-ui').style.display = "none";
+            document.getElementById('level-3-ui').style.display = "block";
+            document.getElementById('mm-hint').innerText = currentItem.mm;
+            renderScramble();
+        }
+    }
+
+    function renderOptions() {
+        let choices = [currentItem.mm];
+        let wrongSource = (currentLevel === 1) ? CONFIG.vocab : CONFIG.sentences;
+        let wrongOptions = wrongSource.filter(item => item.mm !== currentItem.mm);
+        shuffleArray(wrongOptions);
+        while (choices.length < 4 && wrongOptions.length > 0) {
+            let r = wrongOptions.pop().mm;
+            if (!choices.includes(r)) choices.push(r);
+        }
+        shuffleArray(choices);
+        choices.forEach(c => {
+            const b = document.createElement('button');
+            b.innerText = c;
+            b.onclick = () => handleChoice(c, b);
+            document.getElementById('options').appendChild(b);
+        });
+    }
+
+    function handleChoice(selected, btn) {
+    if (!canClick) return;
+    canClick = false;
+    const allBtns = document.querySelectorAll('#options button');
+    allBtns.forEach(b => b.disabled = true);
+    const fb = document.getElementById('feedback');
+    const nextBtn = document.getElementById('next-btn');
+
+    if (selected === currentItem.mm) {
+        btn.classList.add('btn-correct');
+        fb.className = "feedback-correct";
+        fb.innerHTML = `<span>Correct! ✓</span>`;
+        correctCount++;
+        updateStreak(true);
+        
+        // --- ADDED THIS LINE FOR SUCCESS ---
+        trackActivity(`L2-L1 (Level ${currentLevel})`, currentItem.cn, true);
+        
+        nextBtn.style.display = "block";
+    } else {
+        btn.classList.add('btn-wrong'); 
+        allBtns.forEach(b => { if (b.innerText === currentItem.mm) b.classList.add('btn-correct'); });
+        triggerShake();
+        errorCount++;
+        let reIndex = currentIndex + 4;
+        if(reIndex > pool.length) reIndex = pool.length;
+        pool.splice(reIndex, 0, currentItem);
+        if (!missedItems.includes(currentItem)) missedItems.push(currentItem);
+        updateStreak(false);
+        fb.className = "feedback-wrong-box";
+        fb.innerHTML = `<span>✘ Wrong</span><br><span style="font-size:0.9rem;">Correct: ${currentItem.mm}</span>`;
+        
+        // --- ADDED THIS LINE FOR MISTAKES ---
+        trackActivity(`L2-L1 (Level ${currentLevel})`, currentItem.cn, false);
+        
+        nextBtn.style.display = "block";
+    }
+}
+
+    function renderScramble() {
+        let pinyinParts = shuffleArray(currentItem.pyParts.map((obj, i) => {
+            return {w: obj.w, t: obj.t || 'default', id: i};
+        }));
+        pinyinParts.forEach(partObj => {
+            const b = document.createElement('button');
+            b.innerText = partObj.w; 
+            b.className = `pinyin-part part-${partObj.t}`;
+            b.onclick = () => {
+                if(!canClick || b.disabled) return;
+                b.disabled = true;
+                buildResult.push(partObj.w);
+                const slot = document.createElement('span');
+                slot.innerText = partObj.w;
+                slot.className = 'slot-item';
+                document.getElementById('user-build').appendChild(slot);
+                if (buildResult.length === currentItem.pyParts.length) checkSentence();
+            };
+            document.getElementById('scrambled-words').appendChild(b);
+        });
+    }
+
+    function checkSentence() {
+        canClick = false;
+        const userStr = buildResult.join(" ").replace(/\s+([,.!?])/g, '$1');
+        const correctStr = currentItem.pyParts.map(p => p.w).join(" ").replace(/\s+([,.!?])/g, '$1');
+        const fb = document.getElementById('feedback');
+        const nextBtn = document.getElementById('next-btn');
+
+        document.getElementById('undo-btn').disabled = true;
+        document.getElementById('reset-btn').disabled = true;
+        document.getElementById('hint-btn').disabled = true;
+
+        if (userStr === correctStr) {
+            fb.className = "feedback-correct";
+            fb.innerHTML = `<span>Correct! ✓</span><br><small>${currentItem.py}</small>`;
+            correctCount++;
+            updateStreak(true);
+
+            // --- ADD THIS FOR LEVEL 3 SUCCESS ---
+            trackActivity(`L2-L1 (Level ${currentLevel})`, currentItem.cn, true);
+
+            nextBtn.style.display = "block";
+        } else {
+            triggerShake();
+            errorCount++;
+            let reIndex = currentIndex + 3;
+            if(reIndex > pool.length) reIndex = pool.length;
+            pool.splice(reIndex, 0, currentItem);
+            if (!missedItems.includes(currentItem)) missedItems.push(currentItem);
+            updateStreak(false);
+            fb.className = "feedback-wrong-box";
+            fb.innerHTML = `<span>✘ Wrong Order</span><br><small>Correct: ${correctStr}</small>`;
+
+            // --- ADD THIS FOR LEVEL 3 MISTAKE ---
+            trackActivity(`L2-L1 (Level ${currentLevel})`, currentItem.cn, false);
+
+            nextBtn.style.display = "block";
+        }
+    }
+
+    function autoNext() {
+        currentIndex++;
+        if (currentIndex < pool.length) updateQuestion();
+        else showSummary();
+    }
+
+    function updateStreak(isCorrect) {
+        if (isCorrect) {
+            currentStreak++;
+            if (currentStreak > maxStreak) maxStreak = currentStreak;
+            if (currentStreak >= 3) {
+                const s = document.getElementById('streak-display');
+                s.innerText = `🔥 ${currentStreak} Streak!`;
+                s.style.transform = "scale(1.2)";
+                setTimeout(() => s.style.transform = "scale(1)", 200);
+            }
+        } else {
+            currentStreak = 0;
+            document.getElementById('streak-display').innerText = "";
+        }
+    }
+
+    function undoLast() {
+        if (!canClick || buildResult.length === 0) return;
+        const lastWord = buildResult.pop();
+        const display = document.getElementById('user-build');
+        display.removeChild(display.lastChild);
+        const btns = document.querySelectorAll('#scrambled-words button');
+        for (let b of btns) {
+            if (b.innerText === lastWord && b.disabled) {
+                b.disabled = false;
+                break;
+            }
+        }
+    }
+
+    function resetSentence() {
+        if (!canClick) return;
+        buildResult = [];
+        document.getElementById('user-build').innerHTML = "";
+        document.querySelectorAll('#scrambled-words button').forEach(b => b.disabled = false);
+    }
+
+    function showHint() {
+        document.getElementById('cn-hint-text').innerText = currentItem.cn;
+    }
+function showSummary() {
+    document.getElementById('game-screen').style.display = "none";
+    document.getElementById('summary-screen').style.display = "block";
+    document.getElementById('progress-fill').style.width = "100%";
+
+    const accuracy = Math.round((initialPoolSize / (initialPoolSize + errorCount)) * 100) || 0;
+    const timeSpent = Math.floor((Date.now() - startTime) / 1000);
+
+    // --- TRACKER INTEGRATION ---
+    trackActivity(
+        `FINISH: Level ${currentLevel}`, 
+        `Accuracy: ${accuracy}% | Mistakes: ${errorCount} | Time: ${timeSpent}s`, 
+        accuracy >= 80
+    );
+    // ---------------------------
+
+    document.getElementById('accuracy-pct').innerText = accuracy + "%";
+    let stars = accuracy === 100 ? "⭐⭐⭐" : accuracy >= 70 ? "⭐⭐" : accuracy >= 50 ? "⭐" : "Try Again!";
+    const starEl = document.getElementById('star-rating');
+    starEl.innerText = stars;
+    starEl.className = accuracy < 50 ? "no-stars" : "";
+    
+    document.getElementById('summary-stats').innerHTML = `Mistakes: ${errorCount}<br>Best Streak: ${maxStreak}<br>Time: ${timeSpent}s`;
+    
+    if (missedItems.length > 0) {
+        document.getElementById('review-container').style.display = "block";
+        const list = document.getElementById('review-list');
+        list.innerHTML = "";
+        missedItems.forEach(item => {
+            const div = document.createElement('div');
+            div.className = "review-item";
+            div.innerHTML = `<div class="review-cn">${item.cn} (${item.py})</div><div class="review-mm">${item.mm}</div>`;
+            list.appendChild(div);
+        });
+    }
+}
+    showMainMenu();
+</script>
+</body>
+</html>
