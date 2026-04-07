@@ -119,12 +119,23 @@
             </a>
             <div class="complete-toggle" onclick="toggleStatus('L5', this)">○</div>
         </div>
+        
+        <div class="menu-btn">
+            <a href="lvl2lesson6.html" style="text-decoration:none; color:inherit; display:flex; flex-grow:1; justify-content:space-between; align-items:center;">
+                <div class="lesson-info">
+                    <span class="cn-title">交通工具 (Zhǔyàojiāotōng)</span>
+                    <span class="mm-title">အဓိကကျသောလမ်းပန်းဆက်သွယ်ရေး</span>
+                </div>
+            </a>
+            <div class="complete-toggle" onclick="toggleStatus('L4', this)">○</div>
+        </div>
+
     </div>
     <div class="footer"></div>
 </div>
 
 <script>
-    const totalLessons = 5;
+    const totalLessons = 6;
     let completedLessons = JSON.parse(localStorage.getItem('completedList')) || [];
 
     // --- 1. THEME LOGIC ---
