@@ -44,6 +44,21 @@
         @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
         .shake { animation: shake 0.3s ease-in-out; }
 
+        /* --- NEW: SPEED CONTROL STYLES --- */
+        .speed-control-box {
+            background: var(--section-bg);
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 0.85rem;
+            border: 1px solid var(--border);
+        }
+        .speed-slider { width: 120px; cursor: pointer; }
+
         /* --- FLASHCARD SPECIFIC STYLES --- */
         #study-screen { display: none; padding: 10px; max-height: 80vh; overflow-y: auto; }
         .flashcard-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
@@ -72,12 +87,26 @@
                 <h3 style="margin: 0;">Vocabulary Preview</h3>
                 <button onclick="showMainMenu()" style="padding: 5px 15px; background: #95a5a6; color: white; border: none;">Close</button>
             </div>
-            <p style="font-size: 0.8rem; color: var(--text-sub);">Tap cards to flip. Tap 🔊 to hear Chinese (Slower).</p>
+            
+            <div class="speed-control-box">
+                <span>🐢 Slow</span>
+                <input type="range" min="0.5" max="1.5" step="0.1" value="0.7" class="speed-slider" id="global-speed-study" oninput="syncSpeed(this.value)">
+                <span>Fast 🐰</span>
+            </div>
+
+            <p style="font-size: 0.8rem; color: var(--text-sub);">Tap cards to flip. Tap 🔊 to hear Chinese.</p>
             <div class="flashcard-container" id="flashcard-list"></div>
         </div>
 
         <div id="game-screen" style="display:none;">
             <div id="progress-wrapper"><div id="progress-fill"></div></div>
+            
+            <div class="speed-control-box">
+                <span>🐢</span>
+                <input type="range" min="0.5" max="1.5" step="0.1" value="0.7" class="speed-slider" id="global-speed-game" oninput="syncSpeed(this.value)">
+                <span>🐰</span>
+            </div>
+
             <div id="streak-display"></div>
             <div class="level-header" id="level-tag">--</div>
             <div class="progress-sub" id="progress-info">--</div>
@@ -151,7 +180,7 @@
         { cn: "暖和", py: "nuǎnhuo", mm: "နွေးထွေးသော" },
         { cn: "冷", py: "lěng", mm: "အေးသော" },
         { cn: "热", py: "rè", mm: "ပူသော" },
-        { cn: "凉爽", py: "liángshuǎng", mm: "အေးမြသော" }, // Corrected Pinyin for Character Match
+        { cn: "凉快", py: "liángkuai", mm: "အေးမြသော" },
         { cn: "雨季", py: "yǔjì", mm: "မိုးရာသီ" },
         { cn: "天气预报", py: "tiānqì yùbào", mm: "မိုးလေဝသခန့်မှန်းချက်" },
         { cn: "下雨", py: "xiàyǔ", mm: "မိုးရွာသည်" },
@@ -170,153 +199,49 @@
         { cn: "中暑", py: "zhòngshǔ", mm: "အပူလျှပ်သည်" }
     ],
     sentences: [
-        { 
-            cn: "中国有几个季节？", 
-            py: "Zhōngguó yǒu jǐ ge jìjié?", 
-            mm: "တရုတ်ပြည်မှာ ရာသီဥတု ဘယ်နှစ်ခုရှိလဲ?", 
-            pyParts: [{w:"Zhōngguó"}, {w:"yǒu"}, {w:"jǐ ge"}, {w:"jìjié?"}] 
-        },
-        { 
-            cn: "中国有四个季节：春天，夏天，秋天和冬天。", 
-            py: "Zhōngguó yǒu sì ge jìjié: chūntiān, xiàtiān, qiūtiān hé dōngtiān.", 
-            mm: "တရုတ်ပြည်မှာ ရာသီဥတု ၄ ခုရှိတယ်: နွေဦး၊ နွေ၊ ဆောင်းဦး နဲ့ ဆောင်းရာသီ။", 
-            pyParts: [{w:"Zhōngguó"}, {w:"yǒu sì ge"}, {w:"jìjié:"}, {w:"chūntiān,"}, {w:"xiàtiān,"}, {w:"qiūtiān"}, {w:"hé"}, {w:"dōngtiān."}] 
-        },
-        { 
-            cn: "每个季节的天气怎么样？", 
-            py: "Měi ge jìjié de tiānqì zěnmeyàng?", 
-            mm: "ရာသီဥတုတစ်ခုချင်းစီရဲ့ မိုးလေဝသက ဘယ်လိုလဲ?", 
-            pyParts: [{w:"Měi ge"}, {w:"jìjié de"}, {w:"tiānqì"}, {w:"zěnmeyàng?"}] 
-        },
-        { 
-            cn: "春天暖和、夏天热、秋天凉爽、冬天冷。", 
-            py: "Chūntiān nuǎnhuo, xiàtiān rè, qiūtiān liángshuǎng, dōngtiān lěng.", 
-            mm: "နွေဦးက နွေးထွေးတယ်၊ နွေရာသီက ပူတယ်၊ ဆောင်းဦးက အေးမြတယ်၊ ဆောင်းရာသီက အေးတယ်။", 
-            pyParts: [{w:"Chūntiān"}, {w:"nuǎnhuo,"}, {w:"xiàtiān"}, {w:"rè,"}, {w:"qiūtiān"}, {w:"liángshuǎng,"}, {w:"dōngtiān"}, {w:"lěng."}] 
-        },
-        { 
-            cn: "缅甸有什么季节？", 
-            py: "Miǎndiàn yǒu shénme jìjié?", 
-            mm: "မြန်မာပြည်မှာ ရာသီဥတု ဘယ်နှစ်ခုရှိလဲ?", 
-            pyParts: [{w:"Miǎndiàn"}, {w:"yǒu"}, {w:"shénme"}, {w:"jìjié?"}] 
-        },
-        { 
-            cn: "今天天气怎么样？", 
-            py: "Jīntiān tiānqì zěnmeyàng?", 
-            mm: "ဒီနေ့ မိုးလေဝသက ဘယ်လိုလဲ?", 
-            pyParts: [{w:"Jīntiān"}, {w:"tiānqì"}, {w:"zěnmeyàng?"}] 
-        },
-        { 
-            cn: "天气预报说：下午可能会下雨。", 
-            py: "Tiānqì yùbào shuō: xiàwǔ kěnéng huì xiàyǔ.", 
-            mm: "မိုးလေဝသခန့်မှန်းချက်အရ: နေ့လည်ပိုင်းမှာ မိုးရွာနိုင်တယ်။", 
-            pyParts: [{w:"Tiānqì"}, {w:"yùbào"}, {w:"shuō:"}, {w:"xiàwǔ"}, {w:"kěnéng"}, {w:"huì"}, {w:"xiàyǔ."}] 
-        },
-        { 
-            cn: "你带雨伞了吗？", 
-            py: "Nǐ dài yǔsǎn le ma?", 
-            mm: "မင်း ထီး ပါလား?", 
-            pyParts: [{w:"Nǐ"}, {w:"dài"}, {w:"yǔsǎn"}, {w:"le"}, {w:"ma?"}] 
-        },
-        { 
-            cn: "我带了雨衣。", 
-            py: "Wǒ dài le yǔyī.", 
-            mm: "ငါ မိုးကာအင်္ကျီ ပါပါတယ်။", 
-            pyParts: [{w:"Wǒ"}, {w:"dài le"}, {w:"yǔyī."}] 
-        },
-        { 
-            cn: "你喜欢什么天气？", 
-            py: "Nǐ xǐhuān shénme tiānqì?", 
-            mm: "မင်း ဘယ်လိုမိုးလေဝသမျိုးကို ကြိုက်လဲ?", 
-            pyParts: [{w:"Nǐ"}, {w:"xǐhuān"}, {w:"shénme"}, {w:"tiānqì?"}] 
-        },
-        { 
-            cn: "缅甸有三个季节：夏天、雨季和冬天。", 
-            py: "Miǎndiàn yǒu sān ge jìjié: xiàtiān, yǔjì hé dōngtiān.", 
-            mm: "မြန်မာပြည်မှ ရာသီဥတု ၃ ခုရှိတယ်: နွေရာသီ၊ မိုးရာသီ နဲ့ ဆောင်းရာသီ။", 
-            pyParts: [{w:"Miǎndiàn"}, {w:"yǒu sān ge"}, {w:"jìjié:"}, {w:"xiàtiān,"}, {w:"yǔjì"}, {w:"hé"}, {w:"dōngtiān."}] 
-        },
-        { 
-            cn: "我喜欢晴天，因为我有打算去海边玩。", 
-            py: "Wǒ xǐhuān qíngtiān, yīnwèi wǒ yǒu dǎsuàn qù hǎibiān wán.", 
-            mm: "ငါနေသာတဲ့နေ့ကို ကြိုက်တယ်၊ ဘာလို့လဲဆိုတော့ ငါ ပင်လယ်ကမ်းခြေကို အလည်သွားဖို့ ရည်ရွယ်ထားရှိတယ်။", 
-            pyParts: [{w:"Wǒ"}, {w:"xǐhuān"}, {w:"qíngtiān,"}, {w:"yīnwèi"}, {w:"wǒ yǒu"}, {w:"dǎsuàn"}, {w:"qù"}, {w:"hǎibiān"}, {w:"wán."}] 
-        },
-        { 
-            cn: "我喜欢阴天，因为我怕热。", 
-            py: "Wǒ xǐhuān yīntiān, yīnwèi wǒ pà rè.", 
-            mm: "ငါက မိုးအုံ့တဲ့နေ့ကို ကြိုက်တယ်၊ ဘာလို့လဲဆိုတော့ ငါက အပူကြောက်လို့။", 
-            pyParts: [{w:"Wǒ"}, {w:"xǐhuān"}, {w:"yīntiān,"}, {w:"yīnwèi"}, {w:"wǒ"}, {w:"pà rè."}] 
-        },
-        { 
-            cn: "今年的暑假你有什么安排？", 
-            py: "Jīnnián de shǔjià nǐ yǒu shénme ānpái?", 
-            mm: "ဒီနှစ် နွေရာသီကျောင်းပိတ်ရက်မှာ မင်း ဘာအစီအစဉ်ရှိလဲ?", 
-            pyParts: [{w:"Jīnnián de"}, {w:"shǔjià"}, {w:"nǐ"}, {w:"yǒu shénme"}, {w:"ānpái?"}] 
-        },
-        { 
-            cn: "小鸟在天空上飞来飞去。", 
-            py: "Xiǎoniǎo zài tiānkōng shàng fēi lái fēi qù.", 
-            mm: "ငှက်ကလေးတွေ ကောင်းကင်ပေါ်မှာ ပျံသွားပျံလာ ပျံသန်းနေကြသည်။", 
-            pyParts: [{w:"Xiǎoniǎo"}, {w:"zài"}, {w:"tiānkōng"}, {w:"shàng"}, {w:"fēi lái"}, {w:"fēi qù."}] 
-        },
-        { 
-            cn: "我一紧张就出汗。", 
-            py: "Wǒ yī jǐnzhāng jiù chūhàn.", 
-            mm: "ငါ စိတ်လှုပ်ရှားတာနဲ့ ချွေးထွက်လာတယ်။", 
-            pyParts: [{w:"Wǒ"}, {w:"yī"}, {w:"jǐnzhāng"}, {w:"jiù"}, {w:"chūhàn."}] 
-        },
-        { 
-            cn: "天气预报说下周会有台风。", 
-            py: "Tiānqì yùbào shuō xiàzhōu huì yǒu táifēng.", 
-            mm: "မိုးလေဝသခန့်မှန်းချက်အရ နောက်အပတ်မှာ မုန်တိုင်းရှိမယ်လို့ ပြောတယ်။", 
-            pyParts: [{w:"Tiānqì"}, {w:"yùbào"}, {w:"shuō"}, {w:"xiàzhōu"}, {w:"huì yǒu"}, {w:"táifēng."}] 
-        },
-        { 
-            cn: "今天很热，所以我出了很多汗。", 
-            py: "Jīntiān hěn rè, suǒyǐ wǒ chūle hěnduō hàn.", 
-            mm: "ဒီနေ့ အရမ်းပူတယ်၊ ဒါကြောင့် ငါ ချွေးတွေ အများကြီး ထွက်လာတယ်။", 
-            pyParts: [{w:"Jīntiān"}, {w:"hěn rè,"}, {w:"suǒyǐ"}, {w:"wǒ"}, {w:"chūle"}, {w:"hěnduō"}, {w:"hàn."}] 
-        },
-        { 
-            cn: "下周有台风，所以学校放假。", 
-            py: "Xiàzhōu yǒu táifēng, suǒyǐ xuéxiào fàngjià.", 
-            mm: "နောက်အပတ်မှာ မုန်တိုင်းရှိလို့ ကျောင်းပိတ်တယ်။", 
-            pyParts: [{w:"Xiàzhōu"}, {w:"yǒu"}, {w:"táifēng,"}, {w:"suǒyǐ"}, {w:"xuéxiào"}, {w:"fàngjià."}] 
-        },
-        { 
-            cn: "我很害怕打雷声。", 
-            py: "Wǒ hěn hàipà dǎléishēng.", 
-            mm: "ငါ မိုးကျိုးပစ်သံကို အရမ်းကြောက်တယ်။", 
-            pyParts: [{w:"Wǒ"}, {w:"hěn"}, {w:"hàipà"}, {w:"dǎléishēng."}] 
-        },
-        { 
-            cn: "他中暑了，所以在家休息。", 
-            py: "Tā zhòngshǔle, suǒyǐ zài jiā xiūxi.", 
-            mm: "သူ အပူလျှပ်သွားလို့ အိမ်မှာ အနားယူနေတယ်။", 
-            pyParts: [{w:"Tā"}, {w:"zhòngshǔle,"}, {w:"suǒyǐ"}, {w:"zài jiā"}, {w:"xiūxi."}] 
-        },
-        { 
-            cn: "夏天很容易中暑，大家要小心。", 
-            py: "Xiàtiān hěn róngyì zhòngshǔ, dàjiā yào xiǎoxīn.", 
-            mm: "နွေရာသီမှာ အပူလျှပ်ဖို့ အရမ်းလွယ်ကူတယ်၊ အားလုံးပဲ သတိထားကြပါ။", 
-            pyParts: [{w:"Xiàtiān"}, {w:"hěn róngyì"}, {w:"zhòngshǔ,"}, {w:"dàjiā"}, {w:"yào"}, {w:"xiǎoxīn."}] 
-        }
+        { cn: "中国有几个季节？", py: "Zhōngguó yǒu jǐ ge jìjié?", mm: "တရုတ်ပြည်မှာ ရာသီဥတု ဘယ်နှစ်ခုရှိလဲ?", pyParts: [{w:"Zhōngguó"}, {w:"yǒu"}, {w:"jǐ ge"}, {w:"jìjié?"}] },
+        { cn: "中国有四个季节：春天，夏天，秋天和冬天。", py: "Zhōngguó yǒu sì ge jìjié: chūntiān, xiàtiān, qiūtiān hé dōngtiān.", mm: "တရုတ်ပြည်မှာ ရာသီဥတု ၄ ခုရှိတယ်: နွေဦး၊ နွေ၊ ဆောင်းဦး နဲ့ ဆောင်းရာသီ။", pyParts: [{w:"Zhōngguó"}, {w:"yǒu sì ge"}, {w:"jìjié:"}, {w:"chūntiān,"}, {w:"xiàtiān,"}, {w:"qiūtiān"}, {w:"hé"}, {w:"dōngtiān."}] },
+        { cn: "每个季节的天气怎么样？", py: "Měi ge jìjié de tiānqì zěnmeyàng?", mm: "ရာသီဥတုတစ်ခုချင်းစီရဲ့ မိုးလေဝသက ဘယ်လိုလဲ?", pyParts: [{w:"Měi ge"}, {w:"jìjié de"}, {w:"tiānqì"}, {w:"zěnmeyàng?"}] },
+        { cn: "春天暖和、夏天热、秋天凉爽、冬天冷。", py: "Chūntiān nuǎnhuo, xiàtiān rè, qiūtiān liángshuǎng, dōngtiān lěng.", mm: "နွေဦးက နွေးထွေးတယ်၊ နွေရာသီက ပူတယ်၊ ဆောင်းဦးက အေးမြတယ်၊ ဆောင်းရာသီက အေးတယ်။", pyParts: [{w:"Chūntiān"}, {w:"nuǎnhuo,"}, {w:"xiàtiān"}, {w:"rè,"}, {w:"qiūtiān"}, {w:"liángshuǎng,"}, {w:"dōngtiān"}, {w:"lěng."}] },
+        { cn: "缅甸有什么季节？", py: "Miǎndiàn yǒu shénme jìjié?", mm: "မြန်မာပြည်မှာ ရာသီဥတု ဘယ်နှစ်ခုရှိလဲ?", pyParts: [{w:"Miǎndiàn"}, {w:"yǒu"}, {w:"shénme"}, {w:"jìjié?"}] },
+        { cn: "今天天气怎么样？", py: "Jīntiān tiānqì zěnmeyàng?", mm: "ဒီနေ့ မိုးလေဝသက ဘယ်လိုလဲ?", pyParts: [{w:"Jīntiān"}, {w:"tiānqì"}, {w:"zěnmeyàng?"}] },
+        { cn: "天气预报说：下午可能会下雨。", py: "Tiānqì yùbào shuō: xiàwǔ kěnéng huì xiàyǔ.", mm: "မိုးလေဝသခန့်မှန်းချက်အရ: နေ့လည်ပိုင်းမှာ မိုးရွာနိုင်တယ်။", pyParts: [{w:"Tiānqì"}, {w:"yùbào"}, {w:"shuō:"}, {w:"xiàwǔ"}, {w:"kěnéng"}, {w:"huì"}, {w:"xiàyǔ."}] },
+        { cn: "你带雨伞了吗？", py: "Nǐ dài yǔsǎn le ma?", mm: "မင်း ထီး ပါလား?", pyParts: [{w:"Nǐ"}, {w:"dài"}, {w:"yǔsǎn"}, {w:"le"}, {w:"ma?"}] },
+        { cn: "我带了雨衣。", py: "Wǒ dài le yǔyī.", mm: "ငါ မိုးကာအင်္ကျီ ပါပါတယ်။", pyParts: [{w:"Wǒ"}, {w:"dài le"}, {w:"yǔyī."}] },
+        { cn: "你喜欢什么天气？", py: "Nǐ xǐhuān shénme tiānqì?", mm: "မင်း ဘယ်လိုမိုးလေဝသမျိုးကို ကြိုက်လဲ?", pyParts: [{w:"Nǐ"}, {w:"xǐhuān"}, {w:"shénme"}, {w:"tiānqì?"}] },
+        { cn: "缅甸有三个季节：夏天、雨季和冬天。", py: "Miǎndiàn yǒu sān ge jìjié: xiàtiān, yǔjì hé dōngtiān.", mm: "မြန်မာပြည်မှ ရာသီဥတု ၃ ခုရှိတယ်: နွေရာသီ၊ မိုးရာသီ နဲ့ ဆောင်းရာသီ။", pyParts: [{w:"Miǎndiàn"}, {w:"yǒu sān ge"}, {w:"jìjié:"}, {w:"xiàtiān,"}, {w:"yǔjì"}, {w:"hé"}, {w:"dōngtiān."}] },
+        { cn: "我喜欢晴天，因为我有打算去海边玩。", py: "Wǒ xǐhuān qíngtiān, yīnwèi wǒ yǒu dǎsuàn qù hǎibiān wán.", mm: "ငါနေသာတဲ့နေ့ကို ကြိုက်တယ်၊ ဘာလို့လဲဆိုတော့ ငါ ပင်လယ်ကမ်းခြေကို အလည်သွားဖို့ ရည်ရွယ်ထားရှိတယ်။", pyParts: [{w:"Wǒ"}, {w:"xǐhuān"}, {w:"qíngtiān,"}, {w:"yīnwèi"}, {w:"wǒ yǒu"}, {w:"dǎsuàn"}, {w:"qù"}, {w:"hǎibiān"}, {w:"wán."}] },
+        { cn: "我喜欢阴天，因为 I怕热。", py: "Wǒ xǐhuān yīntiān, yīnwèi wǒ pà rè.", mm: "ငါက မိုးအုံ့တဲ့နေ့ကို ကြိုက်တယ်၊ ဘာလို့လဲဆိုတော့ ငါက အပူကြောက်လို့။", pyParts: [{w:"Wǒ"}, {w:"xǐhuān"}, {w:"yīntiān,"}, {w:"yīnwèi"}, {w:"wǒ"}, {w:"pà rè."}] },
+        { cn: "今年的暑假你有什么安排？", py: "Jīnnián de shǔjià nǐ yǒu shénme ānpái?", mm: "ဒီနှစ် နွေရာသီကျောင်းပိတ်ရက်မှာ မင်း ဘာအစီအစဉ်ရှိလဲ?", pyParts: [{w:"Jīnnián de"}, {w:"shǔjià"}, {w:"nǐ"}, {w:"yǒu shénme"}, {w:"ānpái?"}] },
+        { cn: "小鸟在天空上飞来飞去。", py: "Xiǎoniǎo zài tiānkōng shàng fēi lái fēi qù.", mm: "ငှက်ကလေးတွေ ကောင်းကင်ပေါ်မှာ ပျံသွားပျံလာ ပျံသန်းနေကြသည်။", pyParts: [{w:"Xiǎoniǎo"}, {w:"zài"}, {w:"tiānkōng"}, {w:"shàng"}, {w:"fēi lái"}, {w:"fēi qù."}] },
+        { cn: "我一紧张就出汗。", py: "Wǒ yī jǐnzhāng jiù chūhàn.", mm: "ငါ စိတ်လှုပ်ရှားတာနဲ့ ချွေးထွက်လာတယ်။", pyParts: [{w:"Wǒ"}, {w:"yī"}, {w:"jǐnzhāng"}, {w:"jiù"}, {w:"chūhàn."}] },
+        { cn: "天气预报说下周会有台风。", py: "Tiānqì yùbào shuō xiàzhōu huì yǒu táifēng.", mm: "မိုးလေဝသခန့်မှန်းချက်အရ နောက်အပတ်မှာ မုန်တိုင်းရှိမယ်လို့ ပြောတယ်။", pyParts: [{w:"Tiānqì"}, {w:"yùbào"}, {w:"shuō"}, {w:"xiàzhōu"}, {w:"huì yǒu"}, {w:"táifēng."}] },
+        { cn: "今天很热，所以我出了很多汗。", py: "Jīntiān hěn rè, suǒyǐ wǒ chūle hěnduō hàn.", mm: "ဒီနေ့ အရမ်းပူတယ်၊ ဒါကြောင့် ငါ ချွေးတွေ အများကြီး ထွက်လာတယ်။", pyParts: [{w:"Jīntiān"}, {w:"hěn rè,"}, {w:"suǒyǐ"}, {w:"wǒ"}, {w:"chūle"}, {w:"hěnduō"}, {w:"hàn."}] },
+        { cn: "下周有台风，所以学校放假。", py: "Xiàzhōu yǒu táifēng, suǒyǐ xuéxiào fàngjià.", mm: "နောက်အပတ်မှာ မုန်တိုင်းရှိလို့ ကျောင်းပိတ်တယ်။", pyParts: [{w:"Xiàzhōu"}, {w:"yǒu"}, {w:"táifēng,"}, {w:"suǒyǐ"}, {w:"xuéxiào"}, {w:"fàngjià."}] },
+        { cn: "我很害怕打雷声。", py: "Wǒ hěn hàipà dǎléishēng.", mm: "ငါ မိုးကျိုးပစ်သံကို အရမ်းကြောက်တယ်။", pyParts: [{w:"Wǒ"}, {w:"hěn"}, {w:"hàipà"}, {w:"dǎléishēng."}] },
+        { cn: "他中暑了，所以在家休息。", py: "Tā zhòngshǔle, suǒyǐ zài jiā xiūxi.", mm: "သူ အပူလျှပ်သွားလို့ အိမ်မှာ အနားယူနေတယ်။", pyParts: [{w:"Tā"}, {w:"zhòngshǔle,"}, {w:"suǒyǐ"}, {w:"zài jiā"}, {w:"xiūxi."}] },
+        { cn: "夏天很容易中暑，大家要小心。", py: "Xiàtiān hěn róngyì zhòngshǔ, dàjiā yào xiǎoxīn.", mm: "နွေရာသီမှာ အပူလျှပ်ဖို့ အရမ်းလွယ်ကူတယ်၊ အားလုံးပဲ သတိထားကြပါ။", pyParts: [{w:"Xiàtiān"}, {w:"hěn róngyì"}, {w:"zhòngshǔ,"}, {w:"dàjiā"}, {w:"yào"}, {w:"xiǎoxīn."}] }
     ]
 };
     let currentLevel = 1, pool = [], currentIndex = 0, currentItem = {}, buildResult = [], canClick = true;
     let errorCount = 0, correctCount = 0, currentStreak = 0, maxStreak = 0, startTime = 0, missedItems = [], initialPoolSize = 0;
+    let currentSpeechRate = 0.7;
 
-    // --- TTS FUNCTION (FIXED FOR CONSISTENCY & SLOWNESS) ---
+    // --- SPEED SYNC LOGIC ---
+    function syncSpeed(val) {
+        currentSpeechRate = parseFloat(val);
+        document.getElementById('global-speed-study').value = val;
+        document.getElementById('global-speed-game').value = val;
+    }
+
+    // --- TTS FUNCTION (MANUAL SPEED) ---
     function speakCustom(text) {
-        window.speechSynthesis.cancel(); // Stop current speech
-        
-        // Small timeout ensures the cancel takes effect before new speech starts
+        window.speechSynthesis.cancel();
         setTimeout(() => {
             const msg = new SpeechSynthesisUtterance();
             msg.text = text;
             msg.lang = 'zh-CN';
-            msg.rate = 0.7;  // Slightly slower for better clarity
+            msg.rate = currentSpeechRate; // Uses value from slider
             msg.pitch = 1.0;
             window.speechSynthesis.speak(msg);
         }, 50);
@@ -331,30 +256,18 @@
         CONFIG.vocab.forEach(item => {
             const card = document.createElement('div');
             card.className = "flashcard";
-            
             const content = document.createElement('div');
             content.className = "flashcard-content";
             content.innerHTML = `${item.cn}<br><small>${item.py}</small>`;
-            
             const speaker = document.createElement('button');
             speaker.className = "study-speaker-btn";
             speaker.innerHTML = "🔊 Hear";
-            speaker.onclick = (e) => {
-                e.stopPropagation();
-                speakCustom(item.cn);
-            };
-
+            speaker.onclick = (e) => { e.stopPropagation(); speakCustom(item.cn); };
             card.onclick = () => {
-                if (content.innerHTML.includes(item.cn)) {
-                    content.innerHTML = `<span style="color: #3498db;">${item.mm}</span>`;
-                } else {
-                    content.innerHTML = `${item.cn}<br><small>${item.py}</small>`;
-                }
+                if (content.innerHTML.includes(item.cn)) content.innerHTML = `<span style="color: #3498db;">${item.mm}</span>`;
+                else content.innerHTML = `${item.cn}<br><small>${item.py}</small>`;
             };
-
-            card.appendChild(content);
-            card.appendChild(speaker);
-            list.appendChild(card);
+            card.appendChild(content); card.appendChild(speaker); list.appendChild(card);
         });
     }
 
@@ -365,15 +278,10 @@
         document.getElementById('summary-screen').style.display = "none";
     }
 
-    // --- TTS FOR GAME ---
-    function speakText(isSentence = false) {
-        speakCustom(currentItem.cn);
-    }
+    function speakText(isSentence = false) { speakCustom(currentItem.cn); }
 
-    // --- CORE GAME LOGIC (UNCHANGED) ---
     function retryMistakes() {
-        pool = shuffleArray([...missedItems]);
-        initialPoolSize = pool.length;
+        pool = shuffleArray([...missedItems]); initialPoolSize = pool.length;
         currentIndex = 0; errorCount = 0; missedItems = [];
         document.getElementById('summary-screen').style.display = "none";
         document.getElementById('game-screen').style.display = "block";
@@ -440,8 +348,7 @@
         shuffleArray(choices);
         choices.forEach(c => {
             const b = document.createElement('button');
-            b.innerText = c;
-            b.onclick = () => handleChoice(c, b);
+            b.innerText = c; b.onclick = () => handleChoice(c, b);
             document.getElementById('options').appendChild(b);
         });
     }
@@ -493,9 +400,7 @@
         }
         document.getElementById('next-btn').style.display = "block";
     }
-    function autoNext() {
-        currentIndex++; if (currentIndex < pool.length) updateQuestion(); else showSummary();
-    }
+    function autoNext() { currentIndex++; if (currentIndex < pool.length) updateQuestion(); else showSummary(); }
     function updateStreak(isCorrect) {
         if (isCorrect) {
             currentStreak++; if (currentStreak > maxStreak) maxStreak = currentStreak;
