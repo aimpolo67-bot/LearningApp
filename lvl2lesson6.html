@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Level 2 Lesson 6: 交通工具 (Zhǔyàojiāotōng) - အဓိကကျသောလမ်းပန်းဆက်သွယ်ရေး</title>
+    
+    <style>
+        /* --- ALL ORIGINAL STYLES REMAIN --- */
+        :root { --bg-color: #f0f2f5; --card-bg: white; --text-main: #2c3e50; --text-sub: #7f8c8d; --border: #eee; --section-bg: #ecf0f1; --nav-bg: white; }
+        [data-theme="dark"] { --bg-color: #1a1a1a; --card-bg: #2d2d2d; --text-main: #ecf0f1; --text-sub: #bdc3c7; --border: #444; --section-bg: #383838; --nav-bg: #2d2d2d; }
+        body { font-family: sans-serif; background-color: var(--bg-color); color: var(--text-main); display: flex; justify-content: center; padding: 15px; padding-bottom: 80px; margin: 0; transition: background-color 0.3s; }
+        .bottom-nav { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; }
+        .home-icon-btn { text-decoration: none; background: var(--nav-bg); width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; border-radius: 50%; box-shadow: 0 4px 15px rgba(0,0,0,0.2); font-size: 1.8rem; transition: 0.3s; border: 2px solid #3498db; }
+        #quiz-container { background: var(--card-bg); padding: 20px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 500px; text-align: center; position: relative; overflow: hidden; transition: 0.3s; }
+        .speaker-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #3498db; margin-left: 10px; vertical-align: middle; }
+        .retry-btn { background: #e74c3c; color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; width: 100%; cursor: pointer; margin-top: 10px; }
+        .fade-in { animation: fadeIn 0.4s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        #progress-wrapper { width: 100%; height: 8px; background: var(--border); border-radius: 4px; margin-bottom: 10px; overflow: hidden; }
+        #progress-fill { height: 100%; width: 0%; background: #2ecc71; transition: width 0.3s ease; }
+        #streak-display { font-size: 1.2rem; margin-bottom: 5px; min-height: 1.5rem; }
+        .level-header { background: #2c3e50; color: white; padding: 10px; border-radius: 10px; margin-bottom: 5px; font-weight: bold; }
+        .progress-sub { font-size: 0.85rem; color: var(--text-main); margin-bottom: 15px; background: var(--section-bg); padding: 5px; border-radius: 5px; font-weight: bold; }
+        .display-area { margin: 15px 0; min-height: 3rem; border-bottom: 2px solid var(--border); padding-bottom: 10px; }
+        .chinese-display { font-size: 1.8rem; color: var(--text-main); font-weight: bold; line-height: 1.3; }
+        .pinyin-display { font-size: 1rem; color: var(--text-sub); font-style: italic; }
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+        .scrambled-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 20px; }
+        button { padding: 12px; border: 2px solid #3498db; background: var(--card-bg); color: var(--text-main); border-radius: 10px; cursor: pointer; font-size: 0.95rem; transition: 0.1s; outline: none; }
+        .btn-correct { background: #2ecc71 !important; color: white !important; border-color: #27ae60 !important; }
+        .btn-wrong { background: #e74c3c !important; color: white !important; border-color: #c0392b !important; }
+        #feedback { margin-top: 15px; font-weight: bold; min-height: 45px; padding: 10px; border-radius: 10px; line-height: 1.4; }
+        #user-build { color: #2980b9; font-size: 1.2rem; font-style: italic; margin: 10px 0; min-height: 2.5rem; border: 1px dashed #3498db; padding: 10px; border-radius: 5px; background: var(--section-bg); display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 5px; }
+        #lvl3-controls { margin-top: 25px; display: flex; justify-content: center; gap: 10px; }
+        .next-btn { background: #2ecc71; color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; width: 100%; cursor: pointer; margin-top: 10px; display: none; }
+        .menu-btn { background: #3498db; color: white; font-size: 1.1rem; border: none; padding: 15px; border-radius: 10px; font-weight: bold; margin-bottom: 10px; width: 100%; cursor: pointer; }
+        .home-btn { margin-top: 25px; background: #95a5a6; color: white; border: none; width: 100%; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        #summary-screen { display: none; padding: 20px; }
+        .stat-circle { width: 100px; height: 100px; border-radius: 50%; border: 5px solid #2ecc71; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; margin: 10px auto; color: #2ecc71; }
+        #star-rating { font-size: 2.5rem; color: #f1c40f; margin-bottom: 10px; letter-spacing: 5px; }
+        #review-container { margin-top: 20px; text-align: left; background: var(--section-bg); padding: 15px; border-radius: 10px; border: 1px solid var(--border); max-height: 200px; overflow-y: auto; }
+        .review-item { margin-bottom: 10px; border-bottom: 1px solid var(--border); padding-bottom: 5px; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        .shake { animation: shake 0.3s ease-in-out; }
+
+        /* --- FLASHCARD SPECIFIC STYLES --- */
+        #study-screen { display: none; padding: 10px; max-height: 80vh; overflow-y: auto; }
+        .flashcard-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .flashcard { background: var(--section-bg); height: 110px; border-radius: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; border: 1px solid var(--border); position: relative; padding: 10px; transition: background 0.2s; }
+        .flashcard:active { background: var(--border); }
+        .flashcard-content { font-weight: bold; font-size: 1.1rem; text-align: center; }
+        .study-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 2px solid var(--border); padding-bottom: 10px; }
+        .study-speaker-btn { background: none; border: none; font-size: 1.1rem; color: #3498db; cursor: pointer; margin-top: 5px; }
+    </style>
+</head>
+<body>
+
+    <div id="quiz-container">
+        <div id="menu-screen">
+            <h2 id="app-title" style="color: var(--text-main);">Level 2 Lesson 6: 交通工具 (Zhǔyàojiāotōng) - အဓိကကျသောလမ်းပန်းဆက်သွယ်ရေး</h2>
+            <div id="main-menu">
+                <button class="menu-btn" onclick="goToLevel(1)">Shēngcí (生词)</button>
+                <button class="menu-btn" onclick="goToLevel(2)">Duìhuà (对话)</button>
+                <button class="menu-btn" onclick="goToLevel(3)">Páijùzi (排句子)</button>
+                <button class="menu-btn" style="background: #f1c40f; color: #2c3e50;" onclick="showStudyMode()">📚 Study Mode (Preview)</button>
+            </div>
+        </div>
+
+        <div id="study-screen">
+            <div class="study-header">
+                <h3 style="margin: 0;">Vocabulary Preview</h3>
+                <button onclick="showMainMenu()" style="padding: 5px 15px; background: #95a5a6; color: white; border: none;">Close</button>
+            </div>
+            <p style="font-size: 0.8rem; color: var(--text-sub);">Tap cards to flip. Tap 🔊 to hear Chinese (Slower).</p>
+            <div class="flashcard-container" id="flashcard-list"></div>
+        </div>
+
+        <div id="game-screen" style="display:none;">
+            <div id="progress-wrapper"><div id="progress-fill"></div></div>
+            <div id="streak-display"></div>
+            <div class="level-header" id="level-tag">--</div>
+            <div class="progress-sub" id="progress-info">--</div>
+            
+            <div id="level-1-2-ui" class="fade-in">
+                <div class="display-area">
+                    <div class="chinese-display">
+                        <span id="cn-q">--</span>
+                        <button class="speaker-btn" onclick="speakText()">🔊</button>
+                    </div>
+                    <div class="pinyin-display" id="py-q">--</div>
+                </div>
+            </div>
+
+            <div id="level-3-ui" style="display:none;" class="fade-in">
+                <div style="color: var(--text-sub); font-size: 1.1rem; margin-bottom: 5px;" id="cn-hint-text"></div>
+                <div style="color: var(--text-main); font-size: 1.4rem; font-weight: bold; margin-bottom: 10px;">
+                    <span id="mm-hint">--</span>
+                    <button class="speaker-btn" onclick="speakText(true)">🔊</button>
+                </div>
+                <div id="user-build"></div>
+            </div>
+
+            <div class="options-grid" id="options"></div>
+            <div class="scrambled-grid" id="scrambled-words"></div>
+            
+            <div id="lvl3-controls" style="display:none;">
+                <button class="undo-btn" onclick="undoLast()">Undo</button>
+                <button class="reset-btn" onclick="resetSentence()">Reset</button>
+                <button class="hint-btn" onclick="showHint()">Hint</button>
+            </div>
+
+            <div id="feedback"></div>
+            <button id="next-btn" class="next-btn" onclick="autoNext()">Next Question ➔</button>
+            <button class="home-btn" onclick="showMainMenu()">🏠 Back to Lesson Menu</button>
+        </div>
+
+        <div id="summary-screen">
+            <h2 style="color: var(--text-main);">Lesson Finished!</h2>
+            <div id="star-rating"></div>
+            <div class="stat-circle" id="accuracy-pct">0%</div>
+            <p id="summary-stats" style="color: var(--text-sub); line-height: 1.6;"></p>
+            
+            <div id="review-container" style="display:none;">
+                <div style="font-weight: bold; margin-bottom: 10px; color: #e74c3c;">Review Mistakes:</div>
+                <div id="review-list"></div>
+                <button class="retry-btn" onclick="retryMistakes()">Retry Mistakes Only</button>
+            </div>
+
+            <button class="menu-btn" onclick="showMainMenu()" style="margin-top:15px;">Back to Lesson Menu</button>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <a href="index.html" class="home-icon-btn">🏠</a>
+    </div>
+
+<script>
+    const currentTheme = localStorage.getItem('theme');
+    if (currentTheme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+
+    const CONFIG = {
+        title: "Level 2 Lesson 6: 交通工具 (Zhǔyàojiāotōng) - အဓိကကျသောလမ်းပန်းဆက်သွယ်ရေး",
+        vocab: [
+    // Core Textbook Vocabulary
+    { cn: "主要", py: "zhǔyào", mm: "(adj) အဓိကကျသော" },
+    { cn: "交通", py: "jiāotōng", mm: "(n) လမ်းပန်းဆက်သွယ်ရေး" },
+    { cn: "工具", py: "gōngjù", mm: "(n) ကိရိယာ" },
+    { cn: "飞机", py: "fēijī", mm: "(n) လေယာဉ်" },
+    { cn: "汽车", py: "qìchē", mm: "(n) ကား" },
+    { cn: "火车", py: "huǒchē", mm: "(n) ရထား" },
+    { cn: "船", py: "chuán", mm: "(n) သင်္ဘော/လှေ" },
+    { cn: "选", py: "xuǎn", mm: "(v) ရွေးချယ်သည်" },
+    { cn: "晕", py: "yùn", mm: "(v/adj) မူးသည်" },
+    { cn: "地铁", py: "dìtiě", mm: "(n) မြေအောက်ရထား" },
+    { cn: "开车", py: "kāi chē", mm: "(v) ကားမောင်းသည်" },
+    { cn: "骑", py: "qí", mm: "(v) စီးသည် (ခွစီး)" },
+    { cn: "摩托车", py: "mótuōchē", mm: "(n) မော်တော်ဆိုင်ကယ်" },
+    { cn: "城内", py: "chéngnèi", mm: "(n) မြို့တွင်း" },
+    { cn: "城外", py: "chéngwài", mm: "(n) မြို့ပြင်" },
+    { cn: "火车站", py: "huǒchēzhàn", mm: "(n) ဘူတာရုံ" },
+    { cn: "轮船", py: "lúnchuán", mm: "ပင်လယ်ကူးသင်္ဘော" },
+    { cn: "货车", py: "huòchē", mm: "ကုန်ကား" },
+    { cn: "自行车", py: "zìxíngchē", mm: "စက်ဘီး" },
+    { cn: "喝醉", py: "hē zuì", mm: "အရက်မူးသည်" },
+    { cn: "公共汽车", py: "gōnggòng qìchē", mm: "ဘတ်စ်ကား" },
+    { cn: "不堵车", py: "bù dǔ chē", mm: "လမ်းမပိတ်ဘူး" },
+    { cn: "空气", py: "kōng qì", mm: "လေထု" }
+],
+        sentences: [
+    { 
+        cn: "缅甸的主要交通工具有哪些？", 
+        py: "Miǎndiàn de zhǔyào jiāotōng gōngjù yǒu nǎxiē?", 
+        mm: "မြန်မာနိုင်ငံရဲ့ အဓိကကျ လမ်းပန်းဆက်သွယ်ရေး ကိရိယာတွေက ဘာတွေလဲ။", 
+        pyParts: [{w:"Miǎndiàn"}, {w:"de"}, {w:"zhǔyào"}, {w:"jiāotōng"}, {w:"gōngjù"}, {w:"yǒu"}, {w:"nǎxiē?"}] 
+    },
+    { 
+        cn: "缅甸的主要交通工具有飞机，汽车，火车和船。", 
+        py: "Miǎndiàn de zhǔyào jiāotōng gōngjù yǒu fēijī, qìchē, huǒchē hé chuán.", 
+        mm: "မြန်မာနိုင်ငံရဲ့ အဓိကကျ လမ်းပန်းဆက်သွယ်ရေး ကိရိယာတွေက လေယာဉ်၊ ကား၊ ရထားနဲ့ သင်္ဘောတွေ ဖြစ်ပါတယ်။", 
+        pyParts: [{w:"Miǎndiàn"}, {w:"de"}, {w:"zhǔyào"}, {w:"jiāotōng"}, {w:"gōngjù"}, {w:"yǒu"}, {w:"fēijī,"}, {w:"qìchē,"}, {w:"huǒchē"}, {w:"hé"}, {w:"chuán."}] 
+    },
+    { 
+        cn: "去旅行的话，你会选什么交通工具？", 
+        py: "Qù lǚxíng de huà, nǐ huì xuǎn shénme jiāotōng gōngjù?", 
+        mm: "ခရီးသွားမယ်ဆိုရင် မင်း ဘယ်လို လမ်းပန်းဆက်သွယ်ရေး ကိရိယာကို ရွေးမလဲ။", 
+        pyParts: [{w:"Qù"}, {w:"lǚxíng"}, {w:"de"}, {w:"huà,"}, {w:"nǐ"}, {w:"huì"}, {w:"xuǎn"}, {w:"shénme"}, {w:"jiāotōng"}, {w:"gōngjù?"}] 
+    },
+    { 
+        cn: "去旅行的话，我会选飞机，因为很快。", 
+        py: "Qù lǚxíng de huà, Wǒ huì xuǎn fēijī, yīnwèi hěn kuài.", 
+        mm: "ခရီးသွားမယ်ဆိုရင် ကျွန်တော် လေယာဉ်ကို ရွေးမယ်၊ ဘာလို့လဲဆိုတော့ အရမ်းမြန်လို့ပါ။", 
+        pyParts: [{w:"Qù"}, {w:"lǚxíng"}, {w:"de"}, {w:"huà,"}, {w:"Wǒ"}, {w:"huì"}, {w:"xuǎn"}, {w:"fēijī,"}, {w:"yīnwèi"}, {w:"hěn"}, {w:"kuài."}] 
+    },
+    { 
+        cn: "你喜欢坐船吗？", 
+        py: "Nǐ xǐhuan zuò chuán ma?", 
+        mm: "မင်း သင်္ဘောစီးရတာ ဝါသနာပါသလား။", 
+        pyParts: [{w:"Nǐ"}, {w:"xǐhuan"}, {w:"zuò"}, {w:"chuán"}, {w:"ma?"}] 
+    },
+    { 
+        cn: "我不喜欢，因为我会晕船。", 
+        py: "Wǒ bù xǐhuan, yīnwèi wǒ huì yùn chuán.", 
+        mm: "ကျွန်တော် ဝါသနာမပါဘူး၊ ဘာလို့လဲဆိုတော့ ကျွန်တော် သင်္ဘောမူးတတ်လို့ပါ။", 
+        pyParts: [{w:"Wǒ"}, {w:"bù"}, {w:"xǐhuan,"}, {w:"yīnwèi"}, {w:"wǒ"}, {w:"huì"}, {w:"yùn"}, {w:"chuán."}] 
+    },
+    { 
+        cn: "你坐过地铁吗？", 
+        py: "Nǐ zuò guò dìtiě ma?", 
+        mm: "မင်း မြေအောက်ရထား စီးဖူးသလား။", 
+        pyParts: [{w:"Nǐ"}, {w:"zuò"}, {w:"guò"}, {w:"dìtiě"}, {w:"ma?"}] 
+    },
+    { 
+        cn: "去泰国的时候我坐过。", 
+        py: "Qù tàiguó de shíhou wǒ zuò guò.", 
+        mm: "ထိုင်းနိုင်ငံကို သွားတုန်းက ကျွန်တော် စီးဖူးပါတယ်။", 
+        pyParts: [{w:"Qù"}, {w:"tàiguó"}, {w:"de"}, {w:"shíhou"}, {w:"wǒ"}, {w:"zuò"}, {w:"guò."}] 
+    },
+    { 
+        cn: "你还不会开车。", 
+        py: "Wǒ hái bù huì kāichē.", 
+        mm: "ကျွန်တော် အခုထိ ကားမမောင်းတတ်သေးဘူး။", 
+        pyParts: [{w:"Wǒ"}, {w:"hái"}, {w:"bù"}, {w:"huì"}, {w:"kāichē."}] 
+    },
+    { 
+        cn: "仰光城内不可以骑摩托车，仰光城外可以骑摩托车。", 
+        py: "Yǎngguāng chéngnèi bù kěyǐ qí mótuōchē, Yǎngguāng chéngwài kěyǐ qí mótuōchē.", 
+        mm: "ရန်ကုန်မြို့တွင်းမှာ မော်တော်ဆိုင်ကယ် စီးလို့မရဘူး၊ ရန်ကုန်မြို့ပြင်မှာတော့ မော်တော်ဆိုင်ကယ် စီးလို့ရပါတယ်။", 
+        pyParts: [{w:"Yǎngguāng"}, {w:"chéngnèi"}, {w:"bù"}, {w:"kěyǐ"}, {w:"qí"}, {w:"mótuōchē,"}, {w:"Yǎngguāng"}, {w:"chéngwài"}, {w:"kěyǐ"}, {w:"qí"}, {w:"mótuōchē."}] 
+    },
+    { 
+        cn: "仰光最大的火车站在昂山车站附近。", 
+        py: "Yǎngguāng zuìdà de huǒchēzhàn zài ángshān chēzhàn fùjìn.", 
+        mm: "ရန်ကုန်မှာ အကြီးဆုံး ဘူတာရုံက ဗိုလ်ချုပ်အောင်ဆန်း ဘူတာ အနီးမှာပါ။", 
+        pyParts: [{w:"Yǎngguāng"}, {w:"zuìdà"}, {w:"de"}, {w:"huǒchēzhàn"}, {w:"zài"}, {w:"ángshān"}, {w:"chēzhàn"}, {w:"fùjìn."}] 
+    },
+    { 
+        cn: "仰光的主要交通工具是公车。", 
+        py: "Yǎngguāng de zhǔyào jiāotōng gōngjù shì gōngchē.", 
+        mm: "ရန်ကုန်ရဲ့ အဓိက လမ်းပန်းဆက်သွယ်ရေး ကိရိယာက ဘတ်စ်ကား ဖြစ်ပါတယ်။", 
+        pyParts: [{w:"Yǎngguāng"}, {w:"de"}, {w:"zhǔyào"}, {w:"jiāotōng"}, {w:"gōngjù"}, {w:"shì"}, {w:"gōngchē."}] 
+    },
+    { 
+        cn: "你喜欢什么交通工具？", 
+        py: "Nǐ xǐhuan shénme jiāotōng gōngjù?", 
+        mm: "မင်း ဘယ်လို လမ်းပန်းဆက်သွယ်ရေး ကိရိယာကို ကြိုက်သလဲ။", 
+        pyParts: [{w:"Nǐ"}, {w:"xǐhuan"}, {w:"shénme"}, {w:"jiāotōng"}, {w:"gōngjù?"}] 
+    },
+    { 
+        cn: "他骑摩托车去火车站。", 
+        py: "Tā qí mótuōchē qù huǒchēzhàn.", 
+        mm: "သူ ဆိုင်ကယ်စီးပြီး ဘူတာရုံကို သွားတယ်။", 
+        pyParts: [{w:"Tā"}, {w:"qí"}, {w:"mótuōchē"}, {w:"qù"}, {w:"huǒchēzhàn."}] 
+    },
+    { 
+        cn: "我在新加坡坐过地铁。", 
+        py: "Wǒ zài xīnjiāpō zuò guò dìtiě.", 
+        mm: "ကျွန်တော် စင်ကာပူမှာ မြေအောက်ရထား စီးဖူးတယ်။", 
+        pyParts: [{w:"Wǒ"}, {w:"zài"}, {w:"xīnjiāpō"}, {w:"zuò"}, {w:"guò"}, {w:"dìtiě."}] 
+    },
+    { 
+        cn: "我坐飞机去泰国。", 
+        py: "Wǒ zuò fēijī qù tàiguó.", 
+        mm: "ကျွန်တော် ထိုင်းနိုင်ငံကို လေယာဉ်နဲ့ သွားတယ်။", 
+        pyParts: [{w:"Wǒ"}, {w:"zuò"}, {w:"fēijī"}, {w:"qù"}, {w:"tàiguó."}] 
+    }
+]
+    };
+
+    let currentLevel = 1, pool = [], currentIndex = 0, currentItem = {}, buildResult = [], canClick = true;
+    let errorCount = 0, correctCount = 0, currentStreak = 0, maxStreak = 0, startTime = 0, missedItems = [], initialPoolSize = 0;
+
+    // --- TTS FUNCTION (SLOWED DOWN) ---
+    function speakCustom(text) {
+        window.speechSynthesis.cancel(); // Stop any current speech
+        const msg = new SpeechSynthesisUtterance();
+        msg.text = text;
+        msg.lang = 'zh-CN';
+        msg.rate = 0.8;  // 0.8 is slower and clearer
+        msg.pitch = 1.0; // Normal pitch for clarity
+        window.speechSynthesis.speak(msg);
+    }
+
+    // --- FLASHCARD LOGIC ---
+    function showStudyMode() {
+        document.getElementById('menu-screen').style.display = "none";
+        document.getElementById('study-screen').style.display = "block";
+        const list = document.getElementById('flashcard-list');
+        list.innerHTML = "";
+        CONFIG.vocab.forEach(item => {
+            const card = document.createElement('div');
+            card.className = "flashcard";
+            
+            const content = document.createElement('div');
+            content.className = "flashcard-content";
+            content.innerHTML = `${item.cn}<br><small>${item.py}</small>`;
+            
+            const speaker = document.createElement('button');
+            speaker.className = "study-speaker-btn";
+            speaker.innerHTML = "🔊 Hear";
+            speaker.onclick = (e) => {
+                e.stopPropagation();
+                speakCustom(item.cn);
+            };
+
+            card.onclick = () => {
+                if (content.innerHTML.includes(item.cn)) {
+                    content.innerHTML = `<span style="color: #3498db;">${item.mm}</span>`;
+                } else {
+                    content.innerHTML = `${item.cn}<br><small>${item.py}</small>`;
+                }
+            };
+
+            card.appendChild(content);
+            card.appendChild(speaker);
+            list.appendChild(card);
+        });
+    }
+
+    function showMainMenu() {
+        document.getElementById('menu-screen').style.display = "block";
+        document.getElementById('study-screen').style.display = "none";
+        document.getElementById('game-screen').style.display = "none";
+        document.getElementById('summary-screen').style.display = "none";
+    }
+
+    // --- TTS FOR GAME ---
+    function speakText(isSentence = false) {
+        speakCustom(currentItem.cn);
+    }
+
+    // --- CORE GAME LOGIC (UNCHANGED) ---
+    function retryMistakes() {
+        pool = shuffleArray([...missedItems]);
+        initialPoolSize = pool.length;
+        currentIndex = 0; errorCount = 0; missedItems = [];
+        document.getElementById('summary-screen').style.display = "none";
+        document.getElementById('game-screen').style.display = "block";
+        updateQuestion();
+    }
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+    function triggerShake() {
+        const container = document.getElementById('quiz-container');
+        container.classList.add('shake');
+        setTimeout(() => container.classList.remove('shake'), 300);
+    }
+    function goToLevel(lvl) {
+        currentLevel = lvl; currentIndex = 0; errorCount = 0; correctCount = 0; currentStreak = 0; maxStreak = 0;
+        missedItems = []; startTime = Date.now();
+        document.getElementById('menu-screen').style.display = "none";
+        document.getElementById('game-screen').style.display = "block";
+        let rawPool = (lvl === 1) ? [...CONFIG.vocab] : [...CONFIG.sentences];
+        pool = shuffleArray(rawPool);
+        initialPoolSize = pool.length;
+        if (lvl === 1) document.getElementById('level-tag').innerText = "Shēngcí (生词)";
+        else if (lvl === 2) document.getElementById('level-tag').innerText = "Duìhuà (对话)";
+        else document.getElementById('level-tag').innerText = "Páijùzi (排句子)";
+        document.getElementById('lvl3-controls').style.display = (lvl === 3) ? "flex" : "none";
+        updateQuestion();
+    }
+    function updateQuestion() {
+        canClick = true; document.getElementById('next-btn').style.display = "none";
+        const fb = document.getElementById('feedback'); fb.innerText = ""; fb.className = "";
+        document.getElementById('user-build').innerHTML = ""; document.getElementById('options').innerHTML = "";
+        document.getElementById('scrambled-words').innerHTML = ""; document.getElementById('cn-hint-text').innerText = "";
+        buildResult = [];
+        const progressPct = Math.min(((currentIndex) / initialPoolSize) * 100, 99);
+        document.getElementById('progress-fill').style.width = progressPct + "%";
+        document.getElementById('progress-info').innerText = `Item: ${currentIndex + 1} / ${pool.length}`;
+        currentItem = pool[currentIndex];
+        if (currentLevel < 3) {
+            document.getElementById('level-1-2-ui').style.display = "block";
+            document.getElementById('level-3-ui').style.display = "none";
+            document.getElementById('cn-q').innerText = currentItem.cn;
+            document.getElementById('py-q').innerText = currentItem.py;
+            renderOptions();
+        } else {
+            document.getElementById('level-1-2-ui').style.display = "none";
+            document.getElementById('level-3-ui').style.display = "block";
+            document.getElementById('mm-hint').innerText = currentItem.mm;
+            renderScramble();
+        }
+    }
+    function renderOptions() {
+        let choices = [currentItem.mm];
+        let wrongSource = (currentLevel === 1) ? CONFIG.vocab : CONFIG.sentences;
+        let wrongOptions = wrongSource.filter(item => item.mm !== currentItem.mm);
+        shuffleArray(wrongOptions);
+        while (choices.length < 4 && wrongOptions.length > 0) {
+            let r = wrongOptions.pop().mm;
+            if (!choices.includes(r)) choices.push(r);
+        }
+        shuffleArray(choices);
+        choices.forEach(c => {
+            const b = document.createElement('button');
+            b.innerText = c;
+            b.onclick = () => handleChoice(c, b);
+            document.getElementById('options').appendChild(b);
+        });
+    }
+    function handleChoice(selected, btn) {
+        if (!canClick) return;
+        canClick = false;
+        const allBtns = document.querySelectorAll('#options button');
+        const fb = document.getElementById('feedback');
+        if (selected === currentItem.mm) {
+            btn.classList.add('btn-correct'); fb.className = "feedback-correct"; fb.innerHTML = `<span>Correct! ✓</span>`;
+            correctCount++; updateStreak(true);
+        } else {
+            btn.classList.add('btn-wrong'); allBtns.forEach(b => { if (b.innerText === currentItem.mm) b.classList.add('btn-correct'); });
+            triggerShake(); errorCount++;
+            if (!missedItems.some(i => i.cn === currentItem.cn)) missedItems.push(currentItem);
+            updateStreak(false); fb.className = "feedback-wrong-box";
+            fb.innerHTML = `<span>✘ Wrong</span><br><small>Correct: ${currentItem.mm}</small>`;
+        }
+        document.getElementById('next-btn').style.display = "block";
+    }
+    function renderScramble() {
+        let pinyinParts = shuffleArray(currentItem.pyParts.map((obj, i) => ({w: obj.w, id: i})));
+        pinyinParts.forEach(partObj => {
+            const b = document.createElement('button');
+            b.innerText = partObj.w; b.className = `pinyin-part`;
+            b.onclick = () => {
+                if(!canClick || b.disabled) return;
+                b.disabled = true; buildResult.push(partObj.w);
+                const slot = document.createElement('span'); slot.innerText = partObj.w;
+                document.getElementById('user-build').appendChild(slot);
+                if (buildResult.length === currentItem.pyParts.length) checkSentence();
+            };
+            document.getElementById('scrambled-words').appendChild(b);
+        });
+    }
+    function checkSentence() {
+        canClick = false;
+        const userStr = buildResult.join(" ").replace(/\s+([,.!?])/g, '$1');
+        const correctStr = currentItem.pyParts.map(p => p.w).join(" ").replace(/\s+([,.!?])/g, '$1');
+        const fb = document.getElementById('feedback');
+        if (userStr === correctStr) {
+            fb.className = "feedback-correct"; fb.innerHTML = `<span>Correct! ✓</span>`;
+            correctCount++; updateStreak(true);
+        } else {
+            triggerShake(); errorCount++;
+            if (!missedItems.some(i => i.cn === currentItem.cn)) missedItems.push(currentItem);
+            updateStreak(false); fb.className = "feedback-wrong-box";
+            fb.innerHTML = `<span>✘ Wrong Order</span><br><small>${correctStr}</small>`;
+        }
+        document.getElementById('next-btn').style.display = "block";
+    }
+    function autoNext() {
+        currentIndex++; if (currentIndex < pool.length) updateQuestion(); else showSummary();
+    }
+    function updateStreak(isCorrect) {
+        if (isCorrect) {
+            currentStreak++; if (currentStreak > maxStreak) maxStreak = currentStreak;
+            if (currentStreak >= 3) document.getElementById('streak-display').innerText = `🔥 ${currentStreak} Streak!`;
+        } else {
+            currentStreak = 0; document.getElementById('streak-display').innerText = "";
+        }
+    }
+    function undoLast() {
+        if (!canClick || buildResult.length === 0) return;
+        const lastWord = buildResult.pop();
+        const display = document.getElementById('user-build'); display.removeChild(display.lastChild);
+        const btns = document.querySelectorAll('#scrambled-words button');
+        for (let b of btns) { if (b.innerText === lastWord && b.disabled) { b.disabled = false; break; } }
+    }
+    function resetSentence() {
+        if (!canClick) return; buildResult = []; document.getElementById('user-build').innerHTML = "";
+        document.querySelectorAll('#scrambled-words button').forEach(b => b.disabled = false);
+    }
+    function showHint() { document.getElementById('cn-hint-text').innerText = currentItem.cn; }
+    function showSummary() {
+        document.getElementById('game-screen').style.display = "none";
+        document.getElementById('summary-screen').style.display = "block";
+        const accuracy = Math.round((initialPoolSize / (initialPoolSize + errorCount)) * 100) || 0;
+        document.getElementById('accuracy-pct').innerText = accuracy + "%";
+        document.getElementById('star-rating').innerText = accuracy === 100 ? "⭐⭐⭐" : accuracy >= 70 ? "⭐⭐" : accuracy >= 50 ? "⭐" : "Try Again!";
+        document.getElementById('summary-stats').innerHTML = `Mistakes: ${errorCount}<br>Streak: ${maxStreak}`;
+        if (missedItems.length > 0) {
+            document.getElementById('review-container').style.display = "block";
+            const list = document.getElementById('review-list'); list.innerHTML = "";
+            missedItems.forEach(item => {
+                const div = document.createElement('div'); div.className = "review-item";
+                div.innerHTML = `<b>${item.cn}</b><br><small>${item.mm}</small>`;
+                list.appendChild(div);
+            });
+        } else { document.getElementById('review-container').style.display = "none"; }
+    }
+    showMainMenu();
+</script>
+</body>
+</html>
