@@ -44,6 +44,21 @@
         @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
         .shake { animation: shake 0.3s ease-in-out; }
 
+        /* --- NEW: SPEED CONTROL STYLES --- */
+        .speed-control-box {
+            background: var(--section-bg);
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 0.85rem;
+            border: 1px solid var(--border);
+        }
+        .speed-slider { width: 120px; cursor: pointer; }
+
         /* --- FLASHCARD SPECIFIC STYLES --- */
         #study-screen { display: none; padding: 10px; max-height: 80vh; overflow-y: auto; }
         .flashcard-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
@@ -72,12 +87,26 @@
                 <h3 style="margin: 0;">Vocabulary Preview</h3>
                 <button onclick="showMainMenu()" style="padding: 5px 15px; background: #95a5a6; color: white; border: none;">Close</button>
             </div>
-            <p style="font-size: 0.8rem; color: var(--text-sub);">Tap cards to flip. Tap 🔊 to hear Chinese (Slower).</p>
+            
+            <div class="speed-control-box">
+                <span>🐢 Slow</span>
+                <input type="range" min="0.5" max="1.5" step="0.1" value="0.7" class="speed-slider" id="global-speed-study" oninput="syncSpeed(this.value)">
+                <span>Fast 🐰</span>
+            </div>
+
+            <p style="font-size: 0.8rem; color: var(--text-sub);">Tap cards to flip. Tap 🔊 to hear Chinese.</p>
             <div class="flashcard-container" id="flashcard-list"></div>
         </div>
 
         <div id="game-screen" style="display:none;">
             <div id="progress-wrapper"><div id="progress-fill"></div></div>
+            
+            <div class="speed-control-box">
+                <span>🐢</span>
+                <input type="range" min="0.5" max="1.5" step="0.1" value="0.7" class="speed-slider" id="global-speed-game" oninput="syncSpeed(this.value)">
+                <span>🐰</span>
+            </div>
+
             <div id="streak-display"></div>
             <div class="level-header" id="level-tag">--</div>
             <div class="progress-sub" id="progress-info">--</div>
@@ -299,19 +328,28 @@
         }
     ]
 };
-
     let currentLevel = 1, pool = [], currentIndex = 0, currentItem = {}, buildResult = [], canClick = true;
     let errorCount = 0, correctCount = 0, currentStreak = 0, maxStreak = 0, startTime = 0, missedItems = [], initialPoolSize = 0;
+    let currentSpeechRate = 0.7;
 
-    // --- TTS FUNCTION (SLOWED DOWN) ---
+    // --- SPEED SYNC LOGIC ---
+    function syncSpeed(val) {
+        currentSpeechRate = parseFloat(val);
+        document.getElementById('global-speed-study').value = val;
+        document.getElementById('global-speed-game').value = val;
+    }
+
+    // --- TTS FUNCTION (MANUAL SPEED) ---
     function speakCustom(text) {
-        window.speechSynthesis.cancel(); // Stop any current speech
-        const msg = new SpeechSynthesisUtterance();
-        msg.text = text;
-        msg.lang = 'zh-CN';
-        msg.rate = 0.8;  // 0.8 is slower and clearer
-        msg.pitch = 1.0; // Normal pitch for clarity
-        window.speechSynthesis.speak(msg);
+        window.speechSynthesis.cancel();
+        setTimeout(() => {
+            const msg = new SpeechSynthesisUtterance();
+            msg.text = text;
+            msg.lang = 'zh-CN';
+            msg.rate = currentSpeechRate; // Uses value from slider
+            msg.pitch = 1.0;
+            window.speechSynthesis.speak(msg);
+        }, 50);
     }
 
     // --- FLASHCARD LOGIC ---
@@ -323,30 +361,18 @@
         CONFIG.vocab.forEach(item => {
             const card = document.createElement('div');
             card.className = "flashcard";
-            
             const content = document.createElement('div');
             content.className = "flashcard-content";
             content.innerHTML = `${item.cn}<br><small>${item.py}</small>`;
-            
             const speaker = document.createElement('button');
             speaker.className = "study-speaker-btn";
             speaker.innerHTML = "🔊 Hear";
-            speaker.onclick = (e) => {
-                e.stopPropagation();
-                speakCustom(item.cn);
-            };
-
+            speaker.onclick = (e) => { e.stopPropagation(); speakCustom(item.cn); };
             card.onclick = () => {
-                if (content.innerHTML.includes(item.cn)) {
-                    content.innerHTML = `<span style="color: #3498db;">${item.mm}</span>`;
-                } else {
-                    content.innerHTML = `${item.cn}<br><small>${item.py}</small>`;
-                }
+                if (content.innerHTML.includes(item.cn)) content.innerHTML = `<span style="color: #3498db;">${item.mm}</span>`;
+                else content.innerHTML = `${item.cn}<br><small>${item.py}</small>`;
             };
-
-            card.appendChild(content);
-            card.appendChild(speaker);
-            list.appendChild(card);
+            card.appendChild(content); card.appendChild(speaker); list.appendChild(card);
         });
     }
 
@@ -357,15 +383,10 @@
         document.getElementById('summary-screen').style.display = "none";
     }
 
-    // --- TTS FOR GAME ---
-    function speakText(isSentence = false) {
-        speakCustom(currentItem.cn);
-    }
+    function speakText(isSentence = false) { speakCustom(currentItem.cn); }
 
-    // --- CORE GAME LOGIC (UNCHANGED) ---
     function retryMistakes() {
-        pool = shuffleArray([...missedItems]);
-        initialPoolSize = pool.length;
+        pool = shuffleArray([...missedItems]); initialPoolSize = pool.length;
         currentIndex = 0; errorCount = 0; missedItems = [];
         document.getElementById('summary-screen').style.display = "none";
         document.getElementById('game-screen').style.display = "block";
@@ -432,8 +453,7 @@
         shuffleArray(choices);
         choices.forEach(c => {
             const b = document.createElement('button');
-            b.innerText = c;
-            b.onclick = () => handleChoice(c, b);
+            b.innerText = c; b.onclick = () => handleChoice(c, b);
             document.getElementById('options').appendChild(b);
         });
     }
@@ -485,9 +505,7 @@
         }
         document.getElementById('next-btn').style.display = "block";
     }
-    function autoNext() {
-        currentIndex++; if (currentIndex < pool.length) updateQuestion(); else showSummary();
-    }
+    function autoNext() { currentIndex++; if (currentIndex < pool.length) updateQuestion(); else showSummary(); }
     function updateStreak(isCorrect) {
         if (isCorrect) {
             currentStreak++; if (currentStreak > maxStreak) maxStreak = currentStreak;
