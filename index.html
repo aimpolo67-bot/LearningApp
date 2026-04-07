@@ -130,12 +130,32 @@
             <div class="complete-toggle" onclick="toggleStatus('L6', this)">○</div>
         </div>
 
+        <div class="menu-btn">
+            <a href="lvl2lesson7.html" style="text-decoration:none; color:inherit; display:flex; flex-grow:1; justify-content:space-between; align-items:center;">
+                <div class="lesson-info">
+                    <span class="cn-title">水果 (Fruit)</span>
+                    <span class="mm-title">အသီးအနှံ</span>
+                </div>
+            </a>
+            <div class="complete-toggle" onclick="toggleStatus('L7', this)">○</div>
+        </div>
+
+        <div class="menu-btn">
+            <a href="lvl2lesson8.html" style="text-decoration:none; color:inherit; display:flex; flex-grow:1; justify-content:space-between; align-items:center;">
+                <div class="lesson-info">
+                    <span class="cn-title">在医院 (Zài Yīyuàn)</span>
+                    <span class="mm-title">ဆေးရုံမှာ</span>
+                </div>
+            </a>
+            <div class="complete-toggle" onclick="toggleStatus('L8', this)">○</div>
+        </div>
+
     </div>
     <div class="footer"></div>
 </div>
 
 <script>
-    const totalLessons = 6;
+    const totalLessons = 8;
     let completedLessons = JSON.parse(localStorage.getItem('completedList')) || [];
 
     // --- 1. THEME LOGIC ---
