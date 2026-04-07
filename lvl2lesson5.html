@@ -151,7 +151,7 @@
         { cn: "暖和", py: "nuǎnhuo", mm: "နွေးထွေးသော" },
         { cn: "冷", py: "lěng", mm: "အေးသော" },
         { cn: "热", py: "rè", mm: "ပူသော" },
-        { cn: "凉快", py: "liángshuǎng", mm: "အေးမြသော" },
+        { cn: "凉爽", py: "liángshuǎng", mm: "အေးမြသော" }, // Corrected Pinyin for Character Match
         { cn: "雨季", py: "yǔjì", mm: "မိုးရာသီ" },
         { cn: "天气预报", py: "tiānqì yùbào", mm: "မိုးလေဝသခန့်မှန်းချက်" },
         { cn: "下雨", py: "xiàyǔ", mm: "မိုးရွာသည်" },
@@ -307,15 +307,19 @@
     let currentLevel = 1, pool = [], currentIndex = 0, currentItem = {}, buildResult = [], canClick = true;
     let errorCount = 0, correctCount = 0, currentStreak = 0, maxStreak = 0, startTime = 0, missedItems = [], initialPoolSize = 0;
 
-    // --- TTS FUNCTION (SLOWED DOWN) ---
+    // --- TTS FUNCTION (FIXED FOR CONSISTENCY & SLOWNESS) ---
     function speakCustom(text) {
-        window.speechSynthesis.cancel(); // Stop any current speech
-        const msg = new SpeechSynthesisUtterance();
-        msg.text = text;
-        msg.lang = 'zh-CN';
-        msg.rate = 0.8;  // 0.8 is slower and clearer
-        msg.pitch = 1.0; // Normal pitch for clarity
-        window.speechSynthesis.speak(msg);
+        window.speechSynthesis.cancel(); // Stop current speech
+        
+        // Small timeout ensures the cancel takes effect before new speech starts
+        setTimeout(() => {
+            const msg = new SpeechSynthesisUtterance();
+            msg.text = text;
+            msg.lang = 'zh-CN';
+            msg.rate = 0.7;  // Slightly slower for better clarity
+            msg.pitch = 1.0;
+            window.speechSynthesis.speak(msg);
+        }, 50);
     }
 
     // --- FLASHCARD LOGIC ---
