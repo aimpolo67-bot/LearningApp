@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Level 2 Lesson 10: 银行 (Yínháng) - ဘဏ်</title>
+    
+    <style>
+        /* --- ALL ORIGINAL STYLES REMAIN --- */
+        :root { --bg-color: #f0f2f5; --card-bg: white; --text-main: #2c3e50; --text-sub: #7f8c8d; --border: #eee; --section-bg: #ecf0f1; --nav-bg: white; }
+        [data-theme="dark"] { --bg-color: #1a1a1a; --card-bg: #2d2d2d; --text-main: #ecf0f1; --text-sub: #bdc3c7; --border: #444; --section-bg: #383838; --nav-bg: #2d2d2d; }
+        body { font-family: sans-serif; background-color: var(--bg-color); color: var(--text-main); display: flex; justify-content: center; padding: 15px; padding-bottom: 80px; margin: 0; transition: background-color 0.3s; }
+        .bottom-nav { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; }
+        .home-icon-btn { text-decoration: none; background: var(--nav-bg); width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; border-radius: 50%; box-shadow: 0 4px 15px rgba(0,0,0,0.2); font-size: 1.8rem; transition: 0.3s; border: 2px solid #3498db; }
+        #quiz-container { background: var(--card-bg); padding: 20px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 500px; text-align: center; position: relative; overflow: hidden; transition: 0.3s; }
+        .speaker-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #3498db; margin-left: 10px; vertical-align: middle; }
+        .retry-btn { background: #e74c3c; color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; width: 100%; cursor: pointer; margin-top: 10px; }
+        .fade-in { animation: fadeIn 0.4s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        #progress-wrapper { width: 100%; height: 8px; background: var(--border); border-radius: 4px; margin-bottom: 10px; overflow: hidden; }
+        #progress-fill { height: 100%; width: 0%; background: #2ecc71; transition: width 0.3s ease; }
+        #streak-display { font-size: 1.2rem; margin-bottom: 5px; min-height: 1.5rem; }
+        .level-header { background: #2c3e50; color: white; padding: 10px; border-radius: 10px; margin-bottom: 5px; font-weight: bold; }
+        .progress-sub { font-size: 0.85rem; color: var(--text-main); margin-bottom: 15px; background: var(--section-bg); padding: 5px; border-radius: 5px; font-weight: bold; }
+        .display-area { margin: 15px 0; min-height: 3rem; border-bottom: 2px solid var(--border); padding-bottom: 10px; }
+        .chinese-display { font-size: 1.8rem; color: var(--text-main); font-weight: bold; line-height: 1.3; }
+        .pinyin-display { font-size: 1rem; color: var(--text-sub); font-style: italic; }
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+        .scrambled-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 20px; }
+        button { padding: 12px; border: 2px solid #3498db; background: var(--card-bg); color: var(--text-main); border-radius: 10px; cursor: pointer; font-size: 0.95rem; transition: 0.1s; outline: none; }
+        .btn-correct { background: #2ecc71 !important; color: white !important; border-color: #27ae60 !important; }
+        .btn-wrong { background: #e74c3c !important; color: white !important; border-color: #c0392b !important; }
+        #feedback { margin-top: 15px; font-weight: bold; min-height: 45px; padding: 10px; border-radius: 10px; line-height: 1.4; }
+        #user-build { color: #2980b9; font-size: 1.2rem; font-style: italic; margin: 10px 0; min-height: 2.5rem; border: 1px dashed #3498db; padding: 10px; border-radius: 5px; background: var(--section-bg); display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 5px; }
+        #lvl3-controls { margin-top: 25px; display: flex; justify-content: center; gap: 10px; }
+        .next-btn { background: #2ecc71; color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; width: 100%; cursor: pointer; margin-top: 10px; display: none; }
+        .menu-btn { background: #3498db; color: white; font-size: 1.1rem; border: none; padding: 15px; border-radius: 10px; font-weight: bold; margin-bottom: 10px; width: 100%; cursor: pointer; }
+        .home-btn { margin-top: 25px; background: #95a5a6; color: white; border: none; width: 100%; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        #summary-screen { display: none; padding: 20px; }
+        .stat-circle { width: 100px; height: 100px; border-radius: 50%; border: 5px solid #2ecc71; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; margin: 10px auto; color: #2ecc71; }
+        #star-rating { font-size: 2.5rem; color: #f1c40f; margin-bottom: 10px; letter-spacing: 5px; }
+        #review-container { margin-top: 20px; text-align: left; background: var(--section-bg); padding: 15px; border-radius: 10px; border: 1px solid var(--border); max-height: 200px; overflow-y: auto; }
+        .review-item { margin-bottom: 10px; border-bottom: 1px solid var(--border); padding-bottom: 5px; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        .shake { animation: shake 0.3s ease-in-out; }
+
+        /* --- NEW: SPEED CONTROL STYLES --- */
+        .speed-control-box {
+            background: var(--section-bg);
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 0.85rem;
+            border: 1px solid var(--border);
+        }
+        .speed-slider { width: 120px; cursor: pointer; }
+
+        /* --- FLASHCARD SPECIFIC STYLES --- */
+        #study-screen { display: none; padding: 10px; max-height: 80vh; overflow-y: auto; }
+        .flashcard-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .flashcard { background: var(--section-bg); height: 110px; border-radius: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; border: 1px solid var(--border); position: relative; padding: 10px; transition: background 0.2s; }
+        .flashcard:active { background: var(--border); }
+        .flashcard-content { font-weight: bold; font-size: 1.1rem; text-align: center; }
+        .study-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 2px solid var(--border); padding-bottom: 10px; }
+        .study-speaker-btn { background: none; border: none; font-size: 1.1rem; color: #3498db; cursor: pointer; margin-top: 5px; }
+    </style>
+</head>
+<body>
+
+    <div id="quiz-container">
+        <div id="menu-screen">
+            <h2 id="app-title" style="color: var(--text-main);">Level 2 Lesson 10: 银行 (Yínháng) - ဘဏ်</h2>
+            <div id="main-menu">
+                <button class="menu-btn" onclick="goToLevel(1)">Shēngcí (生词)</button>
+                <button class="menu-btn" onclick="goToLevel(2)">Duìhuà (对话)</button>
+                <button class="menu-btn" onclick="goToLevel(3)">Páijùzi (排句子)</button>
+                <button class="menu-btn" style="background: #f1c40f; color: #2c3e50;" onclick="showStudyMode()">📚 Study Mode (Preview)</button>
+            </div>
+        </div>
+
+        <div id="study-screen">
+            <div class="study-header">
+                <h3 style="margin: 0;">Vocabulary Preview</h3>
+                <button onclick="showMainMenu()" style="padding: 5px 15px; background: #95a5a6; color: white; border: none;">Close</button>
+            </div>
+            
+            <div class="speed-control-box">
+                <span>🐢 Slow</span>
+                <input type="range" min="0.5" max="1.5" step="0.1" value="0.7" class="speed-slider" id="global-speed-study" oninput="syncSpeed(this.value)">
+                <span>Fast 🐰</span>
+            </div>
+
+            <p style="font-size: 0.8rem; color: var(--text-sub);">Tap cards to flip. Tap 🔊 to hear Chinese.</p>
+            <div class="flashcard-container" id="flashcard-list"></div>
+        </div>
+
+        <div id="game-screen" style="display:none;">
+            <div id="progress-wrapper"><div id="progress-fill"></div></div>
+            
+            <div class="speed-control-box">
+                <span>🐢</span>
+                <input type="range" min="0.5" max="1.5" step="0.1" value="0.7" class="speed-slider" id="global-speed-game" oninput="syncSpeed(this.value)">
+                <span>🐰</span>
+            </div>
+
+            <div id="streak-display"></div>
+            <div class="level-header" id="level-tag">--</div>
+            <div class="progress-sub" id="progress-info">--</div>
+            
+            <div id="level-1-2-ui" class="fade-in">
+                <div class="display-area">
+                    <div class="chinese-display">
+                        <span id="cn-q">--</span>
+                        <button class="speaker-btn" onclick="speakText()">🔊</button>
+                    </div>
+                    <div class="pinyin-display" id="py-q">--</div>
+                </div>
+            </div>
+
+            <div id="level-3-ui" style="display:none;" class="fade-in">
+                <div style="color: var(--text-sub); font-size: 1.1rem; margin-bottom: 5px;" id="cn-hint-text"></div>
+                <div style="color: var(--text-main); font-size: 1.4rem; font-weight: bold; margin-bottom: 10px;">
+                    <span id="mm-hint">--</span>
+                    <button class="speaker-btn" onclick="speakText(true)">🔊</button>
+                </div>
+                <div id="user-build"></div>
+            </div>
+
+            <div class="options-grid" id="options"></div>
+            <div class="scrambled-grid" id="scrambled-words"></div>
+            
+            <div id="lvl3-controls" style="display:none;">
+                <button class="undo-btn" onclick="undoLast()">Undo</button>
+                <button class="reset-btn" onclick="resetSentence()">Reset</button>
+                <button class="hint-btn" onclick="showHint()">Hint</button>
+            </div>
+
+            <div id="feedback"></div>
+            <button id="next-btn" class="next-btn" onclick="autoNext()">Next Question ➔</button>
+            <button class="home-btn" onclick="showMainMenu()">🏠 Back to Lesson Menu</button>
+        </div>
+
+        <div id="summary-screen">
+            <h2 style="color: var(--text-main);">Lesson Finished!</h2>
+            <div id="star-rating"></div>
+            <div class="stat-circle" id="accuracy-pct">0%</div>
+            <p id="summary-stats" style="color: var(--text-sub); line-height: 1.6;"></p>
+            
+            <div id="review-container" style="display:none;">
+                <div style="font-weight: bold; margin-bottom: 10px; color: #e74c3c;">Review Mistakes:</div>
+                <div id="review-list"></div>
+                <button class="retry-btn" onclick="retryMistakes()">Retry Mistakes Only</button>
+            </div>
+
+            <button class="menu-btn" onclick="showMainMenu()" style="margin-top:15px;">Back to Lesson Menu</button>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <a href="index.html" class="home-icon-btn">🏠</a>
+    </div>
+
+<script>
+    const currentTheme = localStorage.getItem('theme');
+    if (currentTheme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+
+    const CONFIG = {
+    title: "Level 2 Lesson 10: 银行 (Yínháng) - ဘဏ်",
+    vocab: [
+        { cn: "账户", py: "zhànghù", mm: "ဘဏ်အကောင့်" },
+        { cn: "填表", py: "tián biǎo", mm: "(v) ဖောင်ဖြည့်သည်" },
+        { cn: "张", py: "zhāng", mm: "(m) ရွက်/စောင် စသည်တို့အတွက်" },
+        { cn: "身份证", py: "shēnfènzhèng", mm: "မှတ်ပုံတင်" },
+        { cn: "存", py: "cún", mm: "(v) သိမ်းသည် (ငွေစုသည်)" },
+        { cn: "利息", py: "lìxi", mm: "အတိုး" },
+        { cn: "计算", py: "jìsuàn", mm: "(v) တွက်ချက်သည်" },
+        { cn: "汇钱", py: "huì qián", mm: "(v) ငွေလွှဲသည် (bank)" },
+        { cn: "线上", py: "xiànshàng", mm: "online" },
+        { cn: "支付", py: "zhīfù", mm: "(v) ပေးချေသည်" },
+        { cn: "接受", py: "jiēshòu", mm: "(v) သဘောတူလက်ခံသည်" },
+        { cn: "扫", py: "sǎo", mm: "(v) scan ဖတ်သည် / လှည်းကျင်းသည်" },
+        { cn: "转", py: "zhuǎn", mm: "(v) လွှဲပြောင်းသည် (online transfer)" },
+        { cn: "查", py: "chá", mm: "(v) စစ်ဆေးသည်" },
+        { cn: "收到", py: "shōudào", mm: "(v) လက်ခံရရှိသည်" },
+        { cn: "取钱", py: "qǔqián", mm: "(v) ငွေထုတ်သည်" },
+        { cn: "二维码", py: "èr wéi mǎ", mm: "QR code" },
+        { cn: "取款机", py: "qǔ kuǎn jī", mm: "ATM စက် (ငွေထုတ်စက်)" },
+        { cn: "现金", py: "xiànjīn", mm: "ငွေသား (Cash)" },
+        { cn: "成功", py: "chénggōng", mm: "အောင်မြင်သည်" },
+        { cn: "失败", py: "shībài", mm: "ကျရှုံးသည်" },
+        { cn: "计算器", py: "jìsuànqì", mm: "ဂဏန်းပေါင်းစက် (Calculator)" },
+        { cn: "柜台", py: "guìtái", mm: "ကောင်တာ" }
+    ],
+    sentences: [
+        // --- 对话 (一) Dialogue Part 1 ---
+        { 
+            cn: "你好，我想开一个银行账户。", 
+            py: "Nǐ hǎo, wǒ xiǎng kāi yí ge yínháng zhànghù.", 
+            mm: "မင်္ဂလာပါ၊ ကျွန်တော် ဘဏ်အကောင့်တစ်ခု ဖွင့်ချင်လို့ပါ။", 
+            pyParts: [{w:"Nǐ hǎo,"}, {w:"wǒ"}, {w:"xiǎng"}, {w:"kāi"}, {w:"yí ge"}, {w:"yínháng"}, {w:"zhànghù."}] 
+        },
+        { 
+            cn: "请填一下这张表。", 
+            py: "Qǐng tián yí xià zhè zhāng biǎo.", 
+            mm: "ကျေးဇူးပြုပြီး ဒီဖောင်လေးကို ခဏလောက် ဖြည့်ပေးပါ။", 
+            pyParts: [{w:"Qǐng"}, {w:"tián"}, {w:"yí xià"}, {w:"zhè zhāng"}, {w:"biǎo."}] 
+        },
+        { 
+            cn: "填好了，这是我的身份证。", 
+            py: "Tián hǎo le, zhè shì wǒ de shēnfènzhèng.", 
+            mm: "ဖြည့်ပြီးပါပြီ၊ ဒါက ကျွန်တော့်ရဲ့ မှတ်ပုံတင်ပါ။", 
+            pyParts: [{w:"Tián hǎo le,"}, {w:"zhè shì"}, {w:"wǒ de"}, {w:"shēnfènzhèng."}] 
+        },
+        { 
+            cn: "你要存多少钱？", 
+            py: "Nǐ yào cún duō shao qián?", 
+            mm: "မင်း ငွေဘယ်လောက် အပ်နှံ (စု) မလဲ?", 
+            pyParts: [{w:"Nǐ"}, {w:"yào"}, {w:"cún"}, {w:"duō shao"}, {w:"qián?"}] 
+        },
+        { 
+            cn: "我要存两百五十万。请问每个月都有利息吗？", 
+            py: "Wǒ yào cún liǎng bǎi wǔ shí wàn. Qǐng wèn měi ge yuè dōu yǒu lì xi ma?", 
+            mm: "ကျွန်တော် နှစ်သန်းခွဲ အပ်ပါမယ်။ လစဉ် အတိုးရပါသလားခင်ဗျာ?", 
+            pyParts: [{w:"Wǒ yào cún"}, {w:"liǎng bǎi wǔ shí wàn."}, {w:"Qǐng wèn"}, {w:"měi ge yuè"}, {w:"dōu yǒu"}, {w:"lì xi"}, {w:"ma?"}] 
+        },
+        { 
+            cn: "有，但是三个月才计算一次。", 
+            py: "Yǒu, dàn shì sān ge yuè cái jì suàn yí cì.", 
+            mm: "ရပါတယ်၊ ဒါပေမယ့် သုံးလမှ တစ်ကြိမ်ပဲ တွက်ချက်ပေးပါတယ်။", 
+            pyParts: [{w:"Yǒu,"}, {w:"dàn shì"}, {w:"sān ge yuè"}, {w:"cái"}, {w:"jì suàn"}, {w:"yí cì."}] 
+        },
+        { 
+            cn: "请问汇钱要去哪个柜台？", 
+            py: "Qǐng wèn huì qián yào qù nǎ ge guì tái?", 
+            mm: "ငွေလွှဲဖို့အတွက် ဘယ်ကောင်တာကို သွားရမလဲခင်ဗျာ?", 
+            pyParts: [{w:"Qǐng wèn"}, {w:"huì qián"}, {w:"yào qù"}, {w:"nǎ ge"}, {w:"guì tái?"}] 
+        },
+        { 
+            cn: "请到二号柜台。", 
+            py: "Qǐng dào èr hào guì tái.", 
+            mm: "နံပါတ် (၂) ကောင်တာကို ကြွပေးပါ။", 
+            pyParts: [{w:"Qǐng"}, {w:"dào"}, {w:"èr hào"}, {w:"guì tái."}] 
+        },
+
+        // --- 对话 (二) Dialogue Part 2 ---
+        { 
+            cn: "请问你们这里可以线上支付吗？", 
+            py: "Qǐng wèn nǐ men zhè lǐ kě yǐ xiàn shàng zhī fù ma?", 
+            mm: "ဒီမှာ online ကနေ ငွေပေးချေလို့ ရပါသလား?", 
+            pyParts: [{w:"Qǐng wèn"}, {w:"nǐ men"}, {w:"zhè lǐ"}, {w:"kě yǐ"}, {w:"xiàn shàng"}, {w:"zhī fù"}, {w:"ma?"}] 
+        },
+        { 
+            cn: "可以，我们这里接受 KBZ、AYA、CB 银行。", 
+            py: "Kě yǐ, wǒ men zhè lǐ jiē shòu KBZ, AYA, CB yín háng.", 
+            mm: "ရပါတယ်၊ ကျွန်မတို့ဆီမှာ KBZ, AYA, CB ဘဏ်တွေကို လက်ခံပါတယ်။", 
+            pyParts: [{w:"Kě yǐ,"}, {w:"wǒ men"}, {w:"zhè lǐ"}, {w:"jiē shòu"}, {w:"KBZ, AYA, CB"}, {w:"yín háng."}] 
+        },
+        { 
+            cn: "好的，我用 KBZ 支付。", 
+            py: "Hǎo de, wǒ yòng KBZ zhī fù.", 
+            mm: "ကောင်းပါပြီ၊ ကျွန်တော် KBZ နဲ့ ပေးပါ့မယ်။", 
+            pyParts: [{w:"Hǎo de,"}, {w:"wǒ"}, {w:"yòng"}, {w:"KBZ"}, {w:"zhī fù."}] 
+        },
+        { 
+            cn: "二维码在这儿，请扫一扫。", 
+            py: "Èr wéi mǎ zài zhèr, qǐng sǎo yi sǎo.", 
+            mm: "QR code က ဒီမှာပါ၊ scan ဖတ်ပေးပါ။", 
+            pyParts: [{w:"Èr wéi mǎ"}, {w:"zài zhèr,"}, {w:"qǐng"}, {w:"sǎo yi sǎo."}] 
+        },
+        { 
+            cn: "已经转了，请查一下。", 
+            py: "Yǐ jīng zhuǎn le, qǐng chá yí xià.", 
+            mm: "လွှဲပြီးပါပြီ၊ ခဏလောက် စစ်ပေးပါ။", 
+            pyParts: [{w:"Yǐ jīng"}, {w:"zhuǎn le,"}, {w:"qǐng"}, {w:"chá"}, {w:"yí xià."}] 
+        },
+        { 
+            cn: "收到了，谢谢。", 
+            py: "Shōu dào le, xiè xie.", 
+            mm: "လက်ခံရရှိပါပြီ၊ ကျေးဇူးတင်ပါတယ်။", 
+            pyParts: [{w:"Shōu dào le,"}, {w:"xiè xie."}] 
+        },
+        { 
+            cn: "附近哪里可以取钱？", 
+            py: "Fù jìn nǎ lǐ kě yǐ qǔ qián?", 
+            mm: "အနီးအနားမှာ ဘယ်နေရာ ငွေထုတ်လို့ရလဲ?", 
+            pyParts: [{w:"Fù jìn"}, {w:"nǎ lǐ"}, {w:"kě yǐ"}, {w:"qǔ qián?"}] 
+        },
+        { 
+            cn: "前面商场里有取款机。", 
+            py: "Qián mian shāng chǎng lǐ yǒu qǔ kuǎn jī.", 
+            mm: "ရှေ့က ကုန်တိုက်ထဲမှာ ATM စက် ရှိပါတယ်။", 
+            pyParts: [{w:"Qián mian"}, {w:"shāng chǎng lǐ"}, {w:"yǒu"}, {w:"qǔ kuǎn jī."}] 
+        },
+
+        // --- 排句子 Practice Section ---
+        { 
+            cn: "我们这里不接受线上支付。", 
+            py: "Wǒ men zhè lǐ bù jiē shòu xiàn shàng zhī fù.", 
+            mm: "ကျွန်ုပ်တို့ဆီမှာ online နဲ့ ငွေပေးချေမှုကို လက်မခံပါ။", 
+            pyParts: [{w:"Wǒ men"}, {w:"zhè lǐ"}, {w:"bù"}, {w:"jiē shòu"}, {w:"xiàn shàng"}, {w:"zhī fù."}] 
+        },
+        { 
+            cn: "你收到我转的钱了吗？", 
+            py: "Nǐ shōu dào wǒ zhuǎn de qián le ma?", 
+            mm: "ကျွန်တော် လွှဲလိုက်တဲ့ငွေကို မင်း လက်ခံရရှိပြီလား?", 
+            pyParts: [{w:"Nǐ"}, {w:"shōu dào"}, {w:"wǒ"}, {w:"zhuǎn de"}, {w:"qián"}, {w:"le"}, {w:"ma?"}] 
+        },
+        { 
+            cn: "我一个月存三十万。", 
+            py: "Wǒ yí ge yuè cún sān shí wàn.", 
+            mm: "ကျွန်တော် တစ်လကို သုံးသိန်း စုပါတယ်။", 
+            pyParts: [{w:"Wǒ"}, {w:"yí ge yuè"}, {w:"cún"}, {w:"sān shí wàn."}] 
+        },
+        { 
+            cn: "你带身份证了吗？", 
+            py: "Nǐ dài shēnfènzhèng le ma?", 
+            mm: "မင်း မှတ်ပုံတင် ယူလာခဲ့လား?", 
+            pyParts: [{w:"Nǐ"}, {w:"dài"}, {w:"shēnfènzhèng"}, {w:"le"}, {w:"ma?"}] 
+        },
+        { 
+            cn: "你家附近有取款机吗？", 
+            py: "Nǐ jiā fù jìn yǒu qǔ kuǎn jī ma?", 
+            mm: "မင်းအိမ်အနီးအနားမှာ ATM စက် ရှိလား?", 
+            pyParts: [{w:"Nǐ jiā"}, {w:"fù jìn"}, {w:"yǒu"}, {w:"qǔ kuǎn jī"}, {w:"ma?"}] 
+        }
+    ]
+};
+    let currentLevel = 1, pool = [], currentIndex = 0, currentItem = {}, buildResult = [], canClick = true;
+    let errorCount = 0, correctCount = 0, currentStreak = 0, maxStreak = 0, startTime = 0, missedItems = [], initialPoolSize = 0;
+    let currentSpeechRate = 0.7;
+
+    // --- SPEED SYNC LOGIC ---
+    function syncSpeed(val) {
+        currentSpeechRate = parseFloat(val);
+        document.getElementById('global-speed-study').value = val;
+        document.getElementById('global-speed-game').value = val;
+    }
+
+    // --- TTS FUNCTION (MANUAL SPEED) ---
+    function speakCustom(text) {
+        window.speechSynthesis.cancel();
+        setTimeout(() => {
+            const msg = new SpeechSynthesisUtterance();
+            msg.text = text;
+            msg.lang = 'zh-CN';
+            msg.rate = currentSpeechRate; // Uses value from slider
+            msg.pitch = 1.0;
+            window.speechSynthesis.speak(msg);
+        }, 50);
+    }
+
+    // --- FLASHCARD LOGIC ---
+    function showStudyMode() {
+        document.getElementById('menu-screen').style.display = "none";
+        document.getElementById('study-screen').style.display = "block";
+        const list = document.getElementById('flashcard-list');
+        list.innerHTML = "";
+        CONFIG.vocab.forEach(item => {
+            const card = document.createElement('div');
+            card.className = "flashcard";
+            const content = document.createElement('div');
+            content.className = "flashcard-content";
+            content.innerHTML = `${item.cn}<br><small>${item.py}</small>`;
+            const speaker = document.createElement('button');
+            speaker.className = "study-speaker-btn";
+            speaker.innerHTML = "🔊 Hear";
+            speaker.onclick = (e) => { e.stopPropagation(); speakCustom(item.cn); };
+            card.onclick = () => {
+                if (content.innerHTML.includes(item.cn)) content.innerHTML = `<span style="color: #3498db;">${item.mm}</span>`;
+                else content.innerHTML = `${item.cn}<br><small>${item.py}</small>`;
+            };
+            card.appendChild(content); card.appendChild(speaker); list.appendChild(card);
+        });
+    }
+
+    function showMainMenu() {
+        document.getElementById('menu-screen').style.display = "block";
+        document.getElementById('study-screen').style.display = "none";
+        document.getElementById('game-screen').style.display = "none";
+        document.getElementById('summary-screen').style.display = "none";
+    }
+
+    function speakText(isSentence = false) { speakCustom(currentItem.cn); }
+
+    function retryMistakes() {
+        pool = shuffleArray([...missedItems]); initialPoolSize = pool.length;
+        currentIndex = 0; errorCount = 0; missedItems = [];
+        document.getElementById('summary-screen').style.display = "none";
+        document.getElementById('game-screen').style.display = "block";
+        updateQuestion();
+    }
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+    function triggerShake() {
+        const container = document.getElementById('quiz-container');
+        container.classList.add('shake');
+        setTimeout(() => container.classList.remove('shake'), 300);
+    }
+    function goToLevel(lvl) {
+        currentLevel = lvl; currentIndex = 0; errorCount = 0; correctCount = 0; currentStreak = 0; maxStreak = 0;
+        missedItems = []; startTime = Date.now();
+        document.getElementById('menu-screen').style.display = "none";
+        document.getElementById('game-screen').style.display = "block";
+        let rawPool = (lvl === 1) ? [...CONFIG.vocab] : [...CONFIG.sentences];
+        pool = shuffleArray(rawPool);
+        initialPoolSize = pool.length;
+        if (lvl === 1) document.getElementById('level-tag').innerText = "Shēngcí (生词)";
+        else if (lvl === 2) document.getElementById('level-tag').innerText = "Duìhuà (对话)";
+        else document.getElementById('level-tag').innerText = "Páijùzi (排句子)";
+        document.getElementById('lvl3-controls').style.display = (lvl === 3) ? "flex" : "none";
+        updateQuestion();
+    }
+    function updateQuestion() {
+        canClick = true; document.getElementById('next-btn').style.display = "none";
+        const fb = document.getElementById('feedback'); fb.innerText = ""; fb.className = "";
+        document.getElementById('user-build').innerHTML = ""; document.getElementById('options').innerHTML = "";
+        document.getElementById('scrambled-words').innerHTML = ""; document.getElementById('cn-hint-text').innerText = "";
+        buildResult = [];
+        const progressPct = Math.min(((currentIndex) / initialPoolSize) * 100, 99);
+        document.getElementById('progress-fill').style.width = progressPct + "%";
+        document.getElementById('progress-info').innerText = `Item: ${currentIndex + 1} / ${pool.length}`;
+        currentItem = pool[currentIndex];
+        if (currentLevel < 3) {
+            document.getElementById('level-1-2-ui').style.display = "block";
+            document.getElementById('level-3-ui').style.display = "none";
+            document.getElementById('cn-q').innerText = currentItem.cn;
+            document.getElementById('py-q').innerText = currentItem.py;
+            renderOptions();
+        } else {
+            document.getElementById('level-1-2-ui').style.display = "none";
+            document.getElementById('level-3-ui').style.display = "block";
+            document.getElementById('mm-hint').innerText = currentItem.mm;
+            renderScramble();
+        }
+    }
+    function renderOptions() {
+        let choices = [currentItem.mm];
+        let wrongSource = (currentLevel === 1) ? CONFIG.vocab : CONFIG.sentences;
+        let wrongOptions = wrongSource.filter(item => item.mm !== currentItem.mm);
+        shuffleArray(wrongOptions);
+        while (choices.length < 4 && wrongOptions.length > 0) {
+            let r = wrongOptions.pop().mm;
+            if (!choices.includes(r)) choices.push(r);
+        }
+        shuffleArray(choices);
+        choices.forEach(c => {
+            const b = document.createElement('button');
+            b.innerText = c; b.onclick = () => handleChoice(c, b);
+            document.getElementById('options').appendChild(b);
+        });
+    }
+    function handleChoice(selected, btn) {
+        if (!canClick) return;
+        canClick = false;
+        const allBtns = document.querySelectorAll('#options button');
+        const fb = document.getElementById('feedback');
+        if (selected === currentItem.mm) {
+            btn.classList.add('btn-correct'); fb.className = "feedback-correct"; fb.innerHTML = `<span>Correct! ✓</span>`;
+            correctCount++; updateStreak(true);
+        } else {
+            btn.classList.add('btn-wrong'); allBtns.forEach(b => { if (b.innerText === currentItem.mm) b.classList.add('btn-correct'); });
+            triggerShake(); errorCount++;
+            if (!missedItems.some(i => i.cn === currentItem.cn)) missedItems.push(currentItem);
+            updateStreak(false); fb.className = "feedback-wrong-box";
+            fb.innerHTML = `<span>✘ Wrong</span><br><small>Correct: ${currentItem.mm}</small>`;
+        }
+        document.getElementById('next-btn').style.display = "block";
+    }
+    function renderScramble() {
+        let pinyinParts = shuffleArray(currentItem.pyParts.map((obj, i) => ({w: obj.w, id: i})));
+        pinyinParts.forEach(partObj => {
+            const b = document.createElement('button');
+            b.innerText = partObj.w; b.className = `pinyin-part`;
+            b.onclick = () => {
+                if(!canClick || b.disabled) return;
+                b.disabled = true; buildResult.push(partObj.w);
+                const slot = document.createElement('span'); slot.innerText = partObj.w;
+                document.getElementById('user-build').appendChild(slot);
+                if (buildResult.length === currentItem.pyParts.length) checkSentence();
+            };
+            document.getElementById('scrambled-words').appendChild(b);
+        });
+    }
+    function checkSentence() {
+        canClick = false;
+        const userStr = buildResult.join(" ").replace(/\s+([,.!?])/g, '$1');
+        const correctStr = currentItem.pyParts.map(p => p.w).join(" ").replace(/\s+([,.!?])/g, '$1');
+        const fb = document.getElementById('feedback');
+        if (userStr === correctStr) {
+            fb.className = "feedback-correct"; fb.innerHTML = `<span>Correct! ✓</span>`;
+            correctCount++; updateStreak(true);
+        } else {
+            triggerShake(); errorCount++;
+            if (!missedItems.some(i => i.cn === currentItem.cn)) missedItems.push(currentItem);
+            updateStreak(false); fb.className = "feedback-wrong-box";
+            fb.innerHTML = `<span>✘ Wrong Order</span><br><small>${correctStr}</small>`;
+        }
+        document.getElementById('next-btn').style.display = "block";
+    }
+    function autoNext() { currentIndex++; if (currentIndex < pool.length) updateQuestion(); else showSummary(); }
+    function updateStreak(isCorrect) {
+        if (isCorrect) {
+            currentStreak++; if (currentStreak > maxStreak) maxStreak = currentStreak;
+            if (currentStreak >= 3) document.getElementById('streak-display').innerText = `🔥 ${currentStreak} Streak!`;
+        } else {
+            currentStreak = 0; document.getElementById('streak-display').innerText = "";
+        }
+    }
+    function undoLast() {
+        if (!canClick || buildResult.length === 0) return;
+        const lastWord = buildResult.pop();
+        const display = document.getElementById('user-build'); display.removeChild(display.lastChild);
+        const btns = document.querySelectorAll('#scrambled-words button');
+        for (let b of btns) { if (b.innerText === lastWord && b.disabled) { b.disabled = false; break; } }
+    }
+    function resetSentence() {
+        if (!canClick) return; buildResult = []; document.getElementById('user-build').innerHTML = "";
+        document.querySelectorAll('#scrambled-words button').forEach(b => b.disabled = false);
+    }
+    function showHint() { document.getElementById('cn-hint-text').innerText = currentItem.cn; }
+    function showSummary() {
+        document.getElementById('game-screen').style.display = "none";
+        document.getElementById('summary-screen').style.display = "block";
+        const accuracy = Math.round((initialPoolSize / (initialPoolSize + errorCount)) * 100) || 0;
+        document.getElementById('accuracy-pct').innerText = accuracy + "%";
+        document.getElementById('star-rating').innerText = accuracy === 100 ? "⭐⭐⭐" : accuracy >= 70 ? "⭐⭐" : accuracy >= 50 ? "⭐" : "Try Again!";
+        document.getElementById('summary-stats').innerHTML = `Mistakes: ${errorCount}<br>Streak: ${maxStreak}`;
+        if (missedItems.length > 0) {
+            document.getElementById('review-container').style.display = "block";
+            const list = document.getElementById('review-list'); list.innerHTML = "";
+            missedItems.forEach(item => {
+                const div = document.createElement('div'); div.className = "review-item";
+                div.innerHTML = `<b>${item.cn}</b><br><small>${item.mm}</small>`;
+                list.appendChild(div);
+            });
+        } else { document.getElementById('review-container').style.display = "none"; }
+    }
+    showMainMenu();
+</script>
+</body>
+</html>
