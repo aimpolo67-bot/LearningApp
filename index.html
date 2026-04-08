@@ -169,6 +169,16 @@
             </a>
             <div class="complete-toggle" onclick="toggleStatus('L10', this)">○</div>
         </div>
+        
+        <div class="menu-btn">
+            <a href="lvl2lesson11.html" style="text-decoration:none; color:inherit; display:flex; flex-grow:1; justify-content:space-between; align-items:center;">
+                <div class="lesson-info">
+                    <span class="cn-title">衣服(Yīfu)</span>
+                    <span class="mm-title">အင်္ကျီအဝတ်အစား</span>
+                </div>
+            </a>
+            <div class="complete-toggle" onclick="toggleStatus('L11', this)">○</div>
+        </div>
 
 
     </div>
@@ -176,7 +186,7 @@
 </div>
 
 <script>
-    const totalLessons = 10;
+    const totalLessons = 11;
     let completedLessons = JSON.parse(localStorage.getItem('completedList')) || [];
 
     // --- 1. THEME LOGIC ---
