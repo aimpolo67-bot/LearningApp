@@ -180,13 +180,43 @@
             <div class="complete-toggle" onclick="toggleStatus('L11', this)">○</div>
         </div>
 
+        <div class="menu-btn">
+            <a href="lvl2lesson12.html" style="text-decoration:none; color:inherit; display:flex; flex-grow:1; justify-content:space-between; align-items:center;">
+                <div class="lesson-info">
+                    <span class="cn-title">在餐厅(Zài Cāntǐng)</span>
+                    <span class="mm-title">စားသောက်ဆိုင်မှာ</span>
+                </div>
+            </a>
+            <div class="complete-toggle" onclick="toggleStatus('L12', this)">○</div>
+        </div>
+
+        <div class="menu-btn">
+            <a href="lvl2lesson13.html" style="text-decoration:none; color:inherit; display:flex; flex-grow:1; justify-content:space-between; align-items:center;">
+                <div class="lesson-info">
+                    <span class="cn-title">书店(Shūdiàn)</span>
+                    <span class="mm-title">စာအုပ်ဆိုင်</span>
+                </div>
+            </a>
+            <div class="complete-toggle" onclick="toggleStatus('L13', this)">○</div>
+        </div>
+
+        <div class="menu-btn">
+            <a href="lvl2lesson14.html" style="text-decoration:none; color:inherit; display:flex; flex-grow:1; justify-content:space-between; align-items:center;">
+                <div class="lesson-info">
+                    <span class="cn-title">租房子(Zū fángzi)</span>
+                    <span class="mm-title">အိမ်ငှားခြင်း</span>
+                </div>
+            </a>
+            <div class="complete-toggle" onclick="toggleStatus('L14', this)">○</div>
+        </div>
+
 
     </div>
     <div class="footer"></div>
 </div>
 
 <script>
-    const totalLessons = 11;
+    const totalLessons = 14;
     let completedLessons = JSON.parse(localStorage.getItem('completedList')) || [];
 
     // --- 1. THEME LOGIC ---
