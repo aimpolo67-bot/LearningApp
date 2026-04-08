@@ -149,13 +149,34 @@
             </a>
             <div class="complete-toggle" onclick="toggleStatus('L8', this)">○</div>
         </div>
+        
+        <div class="menu-btn">
+            <a href="lvl2lesson4.html" style="text-decoration:none; color:inherit; display:flex; flex-grow:1; justify-content:space-between; align-items:center;">
+                <div class="lesson-info">
+                    <span class="cn-title">颜色 (yánsè)</span>
+                    <span class="mm-title">အရောင်</span>
+                </div>
+            </a>
+            <div class="complete-toggle" onclick="toggleStatus('L9', this)">○</div>
+        </div>
+        
+        <div class="menu-btn">
+            <a href="lvl2lesson4.html" style="text-decoration:none; color:inherit; display:flex; flex-grow:1; justify-content:space-between; align-items:center;">
+                <div class="lesson-info">
+                    <span class="cn-title">银行 (Yínháng)</span>
+                    <span class="mm-title">ဘဏ်</span>
+                </div>
+            </a>
+            <div class="complete-toggle" onclick="toggleStatus('L10', this)">○</div>
+        </div>
+
 
     </div>
     <div class="footer"></div>
 </div>
 
 <script>
-    const totalLessons = 8;
+    const totalLessons = 10;
     let completedLessons = JSON.parse(localStorage.getItem('completedList')) || [];
 
     // --- 1. THEME LOGIC ---
